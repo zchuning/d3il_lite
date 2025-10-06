@@ -3,10 +3,10 @@ import logging
 import numpy as np
 import pybullet
 
-from d3il_sim.core import RobotBase
-from d3il_sim.sims.pybullet.PybulletCamera import PbInHandCamera
-from d3il_sim.utils.geometric_transformation import wxyz_to_xyzw
-from d3il_sim.utils.sim_path import d3il_path
+from d3il_lite.d3il_sim.core import RobotBase
+from d3il_lite.d3il_sim.sims.pybullet.PybulletCamera import PbInHandCamera
+from d3il_lite.d3il_sim.utils.geometric_transformation import wxyz_to_xyzw
+from d3il_lite.d3il_sim.utils.sim_path import d3il_path
 
 
 class PyBulletRobot(RobotBase):

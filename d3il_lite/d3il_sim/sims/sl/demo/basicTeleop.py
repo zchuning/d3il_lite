@@ -2,7 +2,7 @@ import time
 
 import numpy as np
 
-from d3il_sim.sims.sl.SlRobot import SlRobot
+from d3il_lite.d3il_sim.sims.sl.SlRobot import SlRobot
 
 if __name__ == "__main__":
     """

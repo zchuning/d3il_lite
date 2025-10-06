@@ -7,7 +7,7 @@ import numpy as np
 import environments.d3il.d3il_sim.core.sim_object as sim_object
 import environments.d3il.d3il_sim.core.TimeKeeper as time_keeper
 import environments.d3il.d3il_sim.utils.geometric_transformation as geom_trans
-from d3il_sim.core import Camera, Robots
+from d3il_lite.d3il_sim.core import Camera, Robots
 
 
 class Scene(ABC):

@@ -4,11 +4,11 @@ from xml.etree import ElementTree as Et
 import numpy as np
 from mujoco import MjData, MjModel, mj_name2id, mjtObj
 
-from d3il_sim.core.Camera import Camera
-from d3il_sim.sims.mj_beta.mj_utils.mj_helper import IncludeType
-from d3il_sim.sims.mj_beta.mj_utils.mj_render_singleton import render
-from d3il_sim.sims.mj_beta.MjLoadable import MjLoadable
-from d3il_sim.utils.geometric_transformation import (
+from d3il_lite.d3il_sim.core.Camera import Camera
+from d3il_lite.d3il_sim.sims.mj_beta.mj_utils.mj_helper import IncludeType
+from d3il_lite.d3il_sim.sims.mj_beta.mj_utils.mj_render_singleton import render
+from d3il_lite.d3il_sim.sims.mj_beta.MjLoadable import MjLoadable
+from d3il_lite.d3il_sim.utils.geometric_transformation import (
     mat2posQuat,
     posRotMat2TFMat,
     quat2mat,

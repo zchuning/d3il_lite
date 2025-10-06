@@ -4,10 +4,10 @@ from xml.etree.ElementTree import Element
 
 import mujoco
 
-from d3il_sim.sims.mj_beta.mj_utils.mj_helper import IncludeType
-from d3il_sim.sims.mj_beta.mj_utils.mj_scene_object import MjSurrounding
-from d3il_sim.sims.mj_beta.MjLoadable import MjLoadable, MjIncludeTemplate
-from d3il_sim.utils.sim_path import d3il_path
+from d3il_lite.d3il_sim.sims.mj_beta.mj_utils.mj_helper import IncludeType
+from d3il_lite.d3il_sim.sims.mj_beta.mj_utils.mj_scene_object import MjSurrounding
+from d3il_lite.d3il_sim.sims.mj_beta.MjLoadable import MjLoadable, MjIncludeTemplate
+from d3il_lite.d3il_sim.utils.sim_path import d3il_path
 
 
 class MjSceneParser:

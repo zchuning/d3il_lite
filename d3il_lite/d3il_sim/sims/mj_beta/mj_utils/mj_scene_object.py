@@ -6,8 +6,8 @@ import numpy as np
 import yaml
 
 import environments.d3il.d3il_sim.sims.mj_beta.MjLoadable as mj_load
-from d3il_sim.sims.mj_beta.mj_utils.mj_helper import IncludeType
-from d3il_sim.utils import sim_path
+from d3il_lite.d3il_sim.sims.mj_beta.mj_utils.mj_helper import IncludeType
+from d3il_lite.d3il_sim.utils import sim_path
 
 
 class MujocoObject(mj_load.MjXmlLoadable):

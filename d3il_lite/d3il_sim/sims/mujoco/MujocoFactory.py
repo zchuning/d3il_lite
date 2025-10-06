@@ -1,8 +1,8 @@
 import gin
 
 import environments.d3il.d3il_sim.sims.SimFactory as Sims
-from d3il_sim.core import Camera, RobotBase, Scene
-from d3il_sim.utils.sim_path import d3il_path
+from d3il_lite.d3il_sim.core import Camera, RobotBase, Scene
+from d3il_lite.d3il_sim.utils.sim_path import d3il_path
 
 from .MujocoCamera import MujocoCamera
 from .MujocoPrimLoader import to_mj_xml

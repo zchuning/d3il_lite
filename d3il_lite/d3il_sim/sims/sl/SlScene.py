@@ -3,8 +3,8 @@ from typing import List
 import numpy as np
 
 import environments.d3il.d3il_sim.core.sim_object as sim_object
-from d3il_sim.core.Scene import Scene
-from d3il_sim.sims.sl.SlCamera import SlCamera
+from d3il_lite.d3il_sim.core.Scene import Scene
+from d3il_lite.d3il_sim.sims.sl.SlCamera import SlCamera
 
 
 class SlScene(Scene):

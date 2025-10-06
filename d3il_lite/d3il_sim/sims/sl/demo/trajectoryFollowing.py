@@ -1,7 +1,7 @@
 import numpy as np
 
-from d3il_sim.controllers import JointTrajectoryTracker
-from d3il_sim.sims.SimFactory import SimRepository
+from d3il_lite.d3il_sim.controllers import JointTrajectoryTracker
+from d3il_lite.d3il_sim.sims.SimFactory import SimRepository
 
 if __name__ == "__main__":
     sim_factory = SimRepository.get_factory("sl")

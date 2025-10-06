@@ -1,6 +1,6 @@
 import pybullet as p
 
-from d3il_sim.utils.geometric_transformation import wxyz_to_xyzw
+from d3il_lite.d3il_sim.utils.geometric_transformation import wxyz_to_xyzw
 
 
 def pb_load(prim_obj, *args, **kwargs) -> int:

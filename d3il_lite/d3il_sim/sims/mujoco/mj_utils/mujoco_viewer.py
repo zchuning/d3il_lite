@@ -3,7 +3,7 @@ import os.path
 import imageio
 import mujoco_py
 
-from d3il_sim.utils.sim_path import d3il_path
+from d3il_lite.d3il_sim.utils.sim_path import d3il_path
 
 
 class MujocoViewer:

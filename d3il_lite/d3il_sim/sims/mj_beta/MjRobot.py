@@ -5,19 +5,19 @@ from typing import Tuple
 import mujoco
 import numpy as np
 
-from d3il_sim.controllers.Controller import ModelBasedFeedforwardController
-from d3il_sim.core import RobotBase
-from d3il_sim.sims.mj_beta.mj_utils.mj_helper import (
+from d3il_lite.d3il_sim.controllers.Controller import ModelBasedFeedforwardController
+from d3il_lite.d3il_sim.core import RobotBase
+from d3il_lite.d3il_sim.sims.mj_beta.mj_utils.mj_helper import (
     IncludeType,
     get_body_xvelp,
     get_body_xvelr,
 )
-from d3il_sim.sims.mj_beta.MjCamera import MjInhandCamera
-from d3il_sim.sims.mj_beta.MjLoadable import (
+from d3il_lite.d3il_sim.sims.mj_beta.MjCamera import MjInhandCamera
+from d3il_lite.d3il_sim.sims.mj_beta.MjLoadable import (
     MjIncludeTemplate,
     MjXmlLoadable,
 )
-from d3il_sim.utils import sim_path
+from d3il_lite.d3il_sim.utils import sim_path
 
 
 class MjRobot(RobotBase, MjIncludeTemplate):

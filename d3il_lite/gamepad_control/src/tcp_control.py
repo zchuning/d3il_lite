@@ -2,8 +2,8 @@ import abc
 
 import numpy as np
 
-from d3il_sim.sims.universal_sim.PrimitiveObjects import Box
-from d3il_sim.utils import geometric_transformation as geo_trans
+from d3il_lite.d3il_sim.sims.universal_sim.PrimitiveObjects import Box
+from d3il_lite.d3il_sim.utils import geometric_transformation as geo_trans
 
 from .devices import gamepad, phyphox
 

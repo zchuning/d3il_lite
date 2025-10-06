@@ -4,7 +4,7 @@ from typing import Optional, Tuple
 import cv2
 import numpy as np
 
-from d3il_sim.core.sim_object.sim_object import IntelligentSimObject
+from d3il_lite.d3il_sim.core.sim_object.sim_object import IntelligentSimObject
 
 
 class Camera(IntelligentSimObject, ABC):

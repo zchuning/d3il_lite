@@ -2,7 +2,7 @@ import os
 
 from mujoco import MjData, MjModel, mj_name2id, mjtObj
 
-from d3il_sim.sims.mj_beta.mj_utils.mj_renderer import (
+from d3il_lite.d3il_sim.sims.mj_beta.mj_utils.mj_renderer import (
     RenderContext,
     RenderContextOffscreen,
 )

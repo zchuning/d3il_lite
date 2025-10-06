@@ -3,10 +3,10 @@ import os
 import xml.etree.ElementTree as Et
 from typing import Tuple
 
-from d3il_sim.sims.universal_sim.PrimitiveObjects import Box, Sphere, Box
-from d3il_sim.core.sim_object.sim_object import SimObject
-from d3il_sim.sims.mj_beta.MjLoadable import MjXmlLoadable
-from d3il_sim.utils import sim_path
+from d3il_lite.d3il_sim.sims.universal_sim.PrimitiveObjects import Box, Sphere, Box
+from d3il_lite.d3il_sim.core.sim_object.sim_object import SimObject
+from d3il_lite.d3il_sim.sims.mj_beta.MjLoadable import MjXmlLoadable
+from d3il_lite.d3il_sim.utils import sim_path
 
 init_end_eff_pos = [0.525, -0.3, 0.25]
 #init_end_eff_pos = [0.4, -0.5, 0.12]

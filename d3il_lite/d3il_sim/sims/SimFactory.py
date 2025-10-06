@@ -1,8 +1,8 @@
 import abc
 from functools import wraps
 
-from d3il_sim.core import Camera, RobotBase, Scene
-from d3il_sim.sims.universal_sim.PrimitiveObjects import PrimitiveObject
+from d3il_lite.d3il_sim.core import Camera, RobotBase, Scene
+from d3il_lite.d3il_sim.sims.universal_sim.PrimitiveObjects import PrimitiveObject
 
 
 def _register_function_on_class(cls, fn):

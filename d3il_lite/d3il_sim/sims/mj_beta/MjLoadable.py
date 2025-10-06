@@ -3,7 +3,7 @@ import os
 import xml.etree.ElementTree as Et
 from typing import Tuple
 
-from d3il_sim.sims.mj_beta.mj_utils.mj_helper import IncludeType
+from d3il_lite.d3il_sim.sims.mj_beta.mj_utils.mj_helper import IncludeType
 
 
 class MjLoadable(abc.ABC):

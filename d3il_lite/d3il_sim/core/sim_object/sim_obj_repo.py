@@ -1,6 +1,6 @@
 from typing import List
 
-from d3il_sim.utils.unique_dict import UniqueDict
+from d3il_lite.d3il_sim.utils.unique_dict import UniqueDict
 
 from .sim_object import SimObject
 

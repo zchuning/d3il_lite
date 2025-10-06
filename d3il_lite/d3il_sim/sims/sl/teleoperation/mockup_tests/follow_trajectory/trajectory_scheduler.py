@@ -3,23 +3,23 @@ import time
 
 import numpy as np
 
-from d3il_sim.sims.sl.teleoperation.mockup_tests.follow_trajectory.trajectory_controller import (
+from d3il_lite.d3il_sim.sims.sl.teleoperation.mockup_tests.follow_trajectory.trajectory_controller import (
     TrajectoryController,
 )
-from d3il_sim.sims.sl.teleoperation.mockup_tests.follow_trajectory.trajectory_robot import (
+from d3il_lite.d3il_sim.sims.sl.teleoperation.mockup_tests.follow_trajectory.trajectory_robot import (
     TrajectoryMockupRobot,
 )
-from d3il_sim.sims.sl.teleoperation.src.controller.teleop_controller import (
+from d3il_lite.d3il_sim.sims.sl.teleoperation.src.controller.teleop_controller import (
     TeleopReplicaController,
 )
-from d3il_sim.sims.sl.teleoperation.src.schedulers.human_scheduler import (
+from d3il_lite.d3il_sim.sims.sl.teleoperation.src.schedulers.human_scheduler import (
     HumanControlScheduler,
     SchedulerInterface,
 )
-from d3il_sim.sims.sl.teleoperation.src.schedulers.teleop_scheduler import (
+from d3il_lite.d3il_sim.sims.sl.teleoperation.src.schedulers.teleop_scheduler import (
     TeleopReplicaScheduler,
 )
-from d3il_sim.sims.sl.teleoperation.src.util.teaching_log import (
+from d3il_lite.d3il_sim.sims.sl.teleoperation.src.util.teaching_log import (
     TeachingLog,
     TeleopMetaLogger,
 )

@@ -6,16 +6,16 @@ import sys
 
 from gym.spaces import Box
 
-from d3il_sim.utils.sim_path import d3il_path
-from d3il_sim.core import Scene
-from d3il_sim.core.Logger import ObjectLogger, CamLogger
-from d3il_sim.gyms.gym_env_wrapper import GymEnvWrapper
-from d3il_sim.gyms.gym_utils.helpers import obj_distance
-from d3il_sim.utils.geometric_transformation import euler2quat, quat2euler
+from d3il_lite.d3il_sim.utils.sim_path import d3il_path
+from d3il_lite.d3il_sim.core import Scene
+from d3il_lite.d3il_sim.core.Logger import ObjectLogger, CamLogger
+from d3il_lite.d3il_sim.gyms.gym_env_wrapper import GymEnvWrapper
+from d3il_lite.d3il_sim.gyms.gym_utils.helpers import obj_distance
+from d3il_lite.d3il_sim.utils.geometric_transformation import euler2quat, quat2euler
 
-from d3il_sim.sims.mj_beta.MjRobot import MjRobot
-from d3il_sim.sims.mj_beta.MjFactory import MjFactory
-from d3il_sim.sims import MjCamera
+from d3il_lite.d3il_sim.sims.mj_beta.MjRobot import MjRobot
+from d3il_lite.d3il_sim.sims.mj_beta.MjFactory import MjFactory
+from d3il_lite.d3il_sim.sims import MjCamera
 
 from .objects.pushing_objects import get_obj_list, init_end_eff_pos
 

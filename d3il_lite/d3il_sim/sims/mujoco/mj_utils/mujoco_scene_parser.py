@@ -5,9 +5,9 @@ from xml.etree.ElementTree import Element
 
 from mujoco_py import MjSim, load_model_from_path
 
-from d3il_sim.sims.mujoco.mj_utils.mujoco_scene_object import MujocoSurrounding
-from d3il_sim.sims.mujoco.MujocoLoadable import MujocoIncludeTemplate, MujocoLoadable
-from d3il_sim.utils.sim_path import d3il_path
+from d3il_lite.d3il_sim.sims.mujoco.mj_utils.mujoco_scene_object import MujocoSurrounding
+from d3il_lite.d3il_sim.sims.mujoco.MujocoLoadable import MujocoIncludeTemplate, MujocoLoadable
+from d3il_lite.d3il_sim.utils.sim_path import d3il_path
 
 
 class MujocoSceneParser:

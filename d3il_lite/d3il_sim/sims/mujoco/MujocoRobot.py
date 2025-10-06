@@ -4,17 +4,17 @@ import xml.etree.ElementTree as Et
 import mujoco_py
 import numpy as np
 
-from d3il_sim.controllers import (
+from d3il_lite.d3il_sim.controllers import (
     GotoCartPosCartesianRobotController,
     GotoCartPosQuatCartesianRobotController,
 )
-from d3il_sim.controllers.Controller import ModelBasedFeedforwardController
-from d3il_sim.controllers.IKControllers import CartPosQuatCartesianRobotController
-from d3il_sim.core import RobotBase, RobotControlInterface
-from d3il_sim.sims.mujoco.mj_utils.mujoco_helpers import reset_mocap2body_xpos
-from d3il_sim.sims.mujoco.MujocoCamera import MjInhandCamera
-from d3il_sim.sims.mujoco.MujocoLoadable import MujocoIncludeTemplate
-from d3il_sim.utils.sim_path import d3il_path
+from d3il_lite.d3il_sim.controllers.Controller import ModelBasedFeedforwardController
+from d3il_lite.d3il_sim.controllers.IKControllers import CartPosQuatCartesianRobotController
+from d3il_lite.d3il_sim.core import RobotBase, RobotControlInterface
+from d3il_lite.d3il_sim.sims.mujoco.mj_utils.mujoco_helpers import reset_mocap2body_xpos
+from d3il_lite.d3il_sim.sims.mujoco.MujocoCamera import MjInhandCamera
+from d3il_lite.d3il_sim.sims.mujoco.MujocoLoadable import MujocoIncludeTemplate
+from d3il_lite.d3il_sim.utils.sim_path import d3il_path
 
 
 class MujocoRobot(RobotBase, MujocoIncludeTemplate):

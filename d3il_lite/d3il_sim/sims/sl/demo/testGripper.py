@@ -2,8 +2,8 @@ import time
 
 import numpy as np
 
-from d3il_sim.core.Logger import RobotPlotFlags
-from d3il_sim.sims.SimFactory import SimRepository
+from d3il_lite.d3il_sim.core.Logger import RobotPlotFlags
+from d3il_lite.d3il_sim.sims.SimFactory import SimRepository
 
 if __name__ == "__main__":
     # Control gains

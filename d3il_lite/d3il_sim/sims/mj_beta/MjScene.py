@@ -7,17 +7,17 @@ import mujoco
 import numpy as np
 from mujoco import MjData, MjModel, mj_name2id, mjtObj
 
-from d3il_sim.core.Scene import Scene
-from d3il_sim.core.sim_object.sim_object import IntelligentSimObject, SimObject
-from d3il_sim.sims.mj_beta.mj_utils.mj_render_singleton import (
+from d3il_lite.d3il_sim.core.Scene import Scene
+from d3il_lite.d3il_sim.core.sim_object.sim_object import IntelligentSimObject, SimObject
+from d3il_lite.d3il_sim.sims.mj_beta.mj_utils.mj_render_singleton import (
     reset_singleton as reset_render_singleton,
 )
-from d3il_sim.sims.mj_beta.mj_utils.mj_renderer import Viewer
-from d3il_sim.sims.mj_beta.mj_utils.mj_scene_object import MjSurrounding
-from d3il_sim.sims.mj_beta.mj_utils.mj_scene_parser import MjSceneParser
-from d3il_sim.sims.mj_beta.MjCamera import MjCageCam, MjCamera
-from d3il_sim.sims.mj_beta.MjLoadable import MjFreezable, MjXmlLoadable
-from d3il_sim.utils import sim_path
+from d3il_lite.d3il_sim.sims.mj_beta.mj_utils.mj_renderer import Viewer
+from d3il_lite.d3il_sim.sims.mj_beta.mj_utils.mj_scene_object import MjSurrounding
+from d3il_lite.d3il_sim.sims.mj_beta.mj_utils.mj_scene_parser import MjSceneParser
+from d3il_lite.d3il_sim.sims.mj_beta.MjCamera import MjCageCam, MjCamera
+from d3il_lite.d3il_sim.sims.mj_beta.MjLoadable import MjFreezable, MjXmlLoadable
+from d3il_lite.d3il_sim.utils import sim_path
 
 
 class MjScene(Scene):

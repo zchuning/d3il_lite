@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import List, Tuple
 
-from d3il_sim.core.sim_object.sim_object import SimObject
+from d3il_lite.d3il_sim.core.sim_object.sim_object import SimObject
 
 
 class PrimitiveObject(SimObject):

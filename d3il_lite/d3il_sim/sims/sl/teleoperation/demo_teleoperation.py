@@ -1,10 +1,10 @@
-from d3il_sim.sims.sl.teleoperation.demo_teacher import connect_sl_robot
-from d3il_sim.sims.sl.teleoperation.src.controller import teleop_controller as tele_ctrl
-from d3il_sim.sims.sl.teleoperation.src.schedulers.teleop_scheduler import (
+from d3il_lite.d3il_sim.sims.sl.teleoperation.demo_teacher import connect_sl_robot
+from d3il_lite.d3il_sim.sims.sl.teleoperation.src.controller import teleop_controller as tele_ctrl
+from d3il_lite.d3il_sim.sims.sl.teleoperation.src.schedulers.teleop_scheduler import (
     TeleopMetaScheduler,
 )
-from d3il_sim.sims.sl.teleoperation.src.ui.cli_prompts import TeleopCliMap
-from d3il_sim.sims.sl.teleoperation.src.util.teaching_log import TeleopMetaLogger
+from d3il_lite.d3il_sim.sims.sl.teleoperation.src.ui.cli_prompts import TeleopCliMap
+from d3il_lite.d3il_sim.sims.sl.teleoperation.src.util.teaching_log import TeleopMetaLogger
 
 if __name__ == "__main__":
     primary_robot = connect_sl_robot(

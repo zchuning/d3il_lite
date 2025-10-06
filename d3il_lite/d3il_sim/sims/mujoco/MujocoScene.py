@@ -4,13 +4,13 @@ from typing import List
 import numpy as np
 from mujoco_py import MjSim, MjSimState
 
-from d3il_sim.core.Scene import Scene
-from d3il_sim.core.sim_object.sim_object import IntelligentSimObject, SimObject
-from d3il_sim.sims.mujoco.mj_utils.mujoco_scene_object import MujocoSurrounding
-from d3il_sim.sims.mujoco.mj_utils.mujoco_scene_parser import MujocoSceneParser
-from d3il_sim.sims.mujoco.mj_utils.mujoco_viewer import MujocoViewer
-from d3il_sim.sims.mujoco.MujocoCamera import MjCageCam
-from d3il_sim.utils import sim_path
+from d3il_lite.d3il_sim.core.Scene import Scene
+from d3il_lite.d3il_sim.core.sim_object.sim_object import IntelligentSimObject, SimObject
+from d3il_lite.d3il_sim.sims.mujoco.mj_utils.mujoco_scene_object import MujocoSurrounding
+from d3il_lite.d3il_sim.sims.mujoco.mj_utils.mujoco_scene_parser import MujocoSceneParser
+from d3il_lite.d3il_sim.sims.mujoco.mj_utils.mujoco_viewer import MujocoViewer
+from d3il_lite.d3il_sim.sims.mujoco.MujocoCamera import MjCageCam
+from d3il_lite.d3il_sim.utils import sim_path
 
 
 class MujocoScene(Scene):

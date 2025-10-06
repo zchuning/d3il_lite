@@ -1,6 +1,6 @@
 import sched
 
-from d3il_sim.sims.sl.teleoperation.mockup_tests.follow_trajectory.trajectory_scheduler import (
+from d3il_lite.d3il_sim.sims.sl.teleoperation.mockup_tests.follow_trajectory.trajectory_scheduler import (
     MetaTrajectoryScheduler,
 )
 

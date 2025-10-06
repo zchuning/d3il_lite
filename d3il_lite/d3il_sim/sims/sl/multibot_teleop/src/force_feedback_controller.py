@@ -1,7 +1,7 @@
 import numpy as np
 
-from d3il_sim.sims.sl.multibot_teleop.src.human_controller import HumanController
-from d3il_sim.sims.sl.multibot_teleop.src.kalman_filter import KalmanFilter
+from d3il_lite.d3il_sim.sims.sl.multibot_teleop.src.human_controller import HumanController
+from d3il_lite.d3il_sim.sims.sl.multibot_teleop.src.kalman_filter import KalmanFilter
 
 
 def total_force_clip(replica_load, max_force=8.0, a=6.0, b=4.0):

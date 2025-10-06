@@ -4,8 +4,8 @@ import gym
 from gym.utils import seeding
 import numpy as np
 
-from d3il_sim.controllers.Controller import ControllerBase
-from d3il_sim.core import Scene
+from d3il_lite.d3il_sim.controllers.Controller import ControllerBase
+from d3il_lite.d3il_sim.core import Scene
 
 
 class GymEnvWrapper(gym.Env, ABC):
