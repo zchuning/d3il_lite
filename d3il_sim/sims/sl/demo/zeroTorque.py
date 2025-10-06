@@ -2,7 +2,7 @@ import time
 
 import numpy as np
 
-from environments.d3il.d3il_sim.sims.SimFactory import SimRepository
+from d3il_sim.sims.SimFactory import SimRepository
 
 if __name__ == "__main__":
 

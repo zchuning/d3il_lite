@@ -9,7 +9,7 @@ import numpy as np
 
 import environments.d3il.d3il_sim.controllers.GainsInterface as gains
 import environments.d3il.d3il_sim.utils as utils
-from environments.d3il.d3il_sim.controllers.Controller import TrackingController
+from d3il_sim.controllers.Controller import TrackingController
 
 
 class CartPosImpedenceController(TrackingController, gains.CartPosControllerConfig):

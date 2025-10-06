@@ -5,7 +5,7 @@ import time
 import numpy as np
 import py_at_broker as pab
 
-from environments.d3il.d3il_sim.core import RobotBase, RobotDynamicsInterface
+from d3il_sim.core import RobotBase, RobotDynamicsInterface
 
 
 class SLDynamics(RobotDynamicsInterface):

@@ -3,10 +3,10 @@ import os
 
 import pybullet as p
 
-from environments.d3il.d3il_sim.core.sim_object.sim_object import SimObject
-from environments.d3il.d3il_sim.sims.pybullet.PybulletLoadable import PybulletLoadable
-from environments.d3il.d3il_sim.utils.geometric_transformation import euler2quat, wxyz_to_xyzw
-from environments.d3il.d3il_sim.utils.sim_path import d3il_path
+from d3il_sim.core.sim_object.sim_object import SimObject
+from d3il_sim.sims.pybullet.PybulletLoadable import PybulletLoadable
+from d3il_sim.utils.geometric_transformation import euler2quat, wxyz_to_xyzw
+from d3il_sim.utils.sim_path import d3il_path
 
 
 class PyBulletURDFObject(SimObject, PybulletLoadable):

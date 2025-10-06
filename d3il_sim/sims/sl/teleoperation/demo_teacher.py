@@ -1,12 +1,12 @@
 import environments.d3il.d3il_sim.sims.SimFactory as sims
-from environments.d3il.d3il_sim.sims.sl.teleoperation.src.controller.human_controller import (
+from d3il_sim.sims.sl.teleoperation.src.controller.human_controller import (
     HumanController,
 )
-from environments.d3il.d3il_sim.sims.sl.teleoperation.src.schedulers.human_scheduler import (
+from d3il_sim.sims.sl.teleoperation.src.schedulers.human_scheduler import (
     HumanControlScheduler,
 )
-from environments.d3il.d3il_sim.sims.sl.teleoperation.src.ui.cli_prompts import HumanTeacherCliMap
-from environments.d3il.d3il_sim.sims.sl.teleoperation.src.util.teaching_log import TeachingLog
+from d3il_sim.sims.sl.teleoperation.src.ui.cli_prompts import HumanTeacherCliMap
+from d3il_sim.sims.sl.teleoperation.src.util.teaching_log import TeachingLog
 
 
 def connect_sl_robot(*args, **kwargs):

@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as Et
 
-from environments.d3il.d3il_sim.sims.mj_beta.mj_utils.mj_helper import IncludeType
+from d3il_sim.sims.mj_beta.mj_utils.mj_helper import IncludeType
 
 
 def mj_load(prim_obj, *args, **kwargs):

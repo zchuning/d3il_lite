@@ -2,8 +2,8 @@ import os
 import xml.etree.ElementTree as Et
 from typing import Tuple
 
-from environments.d3il.d3il_sim.sims.mujoco import MujocoLoadable as mj_load
-from environments.d3il.d3il_sim.utils import sim_path
+from d3il_sim.sims.mujoco import MujocoLoadable as mj_load
+from d3il_sim.utils import sim_path
 
 
 class MujocoObject(mj_load.MujocoLoadable):

@@ -3,9 +3,9 @@ import warnings
 import numpy as np
 import pybullet as p
 
-from environments.d3il.d3il_sim.core.Camera import Camera
-from environments.d3il.d3il_sim.sims.pybullet.PybulletLoadable import PybulletLoadable
-from environments.d3il.d3il_sim.utils.geometric_transformation import wxyz_to_xyzw, xyzw_to_wxyz
+from d3il_sim.core.Camera import Camera
+from d3il_sim.sims.pybullet.PybulletLoadable import PybulletLoadable
+from d3il_sim.utils.geometric_transformation import wxyz_to_xyzw, xyzw_to_wxyz
 
 
 class PybulletCamera(Camera, PybulletLoadable):

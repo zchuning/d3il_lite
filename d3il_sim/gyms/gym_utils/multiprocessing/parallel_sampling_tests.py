@@ -6,8 +6,8 @@ import time
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from environments.d3il.d3il_sim.gym.gym_controllers import CartPosQuatCartesianRobotController
-from environments.d3il.d3il_sim.gym.gym_utils.multiprocessing.parallel_sampling import (
+from d3il_sim.gym.gym_controllers import CartPosQuatCartesianRobotController
+from d3il_sim.gym.gym_utils.multiprocessing.parallel_sampling import (
     GenericPolicy,
     ParallelSampler,
 )

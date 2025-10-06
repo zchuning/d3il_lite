@@ -1,19 +1,19 @@
 import os
 import time
 
-from environments.d3il.d3il_sim.sims.sl.teleoperation.demo_teacher import connect_sl_robot
-from environments.d3il.d3il_sim.sims.sl.teleoperation.mockup_tests.follow_trajectory.trajectory_controller import (
+from d3il_sim.sims.sl.teleoperation.demo_teacher import connect_sl_robot
+from d3il_sim.sims.sl.teleoperation.mockup_tests.follow_trajectory.trajectory_controller import (
     TrajectoryController,
 )
-from environments.d3il.d3il_sim.sims.sl.teleoperation.mockup_tests.follow_trajectory.trajectory_robot import (
+from d3il_sim.sims.sl.teleoperation.mockup_tests.follow_trajectory.trajectory_robot import (
     TrajectoryMockupRobot,
 )
-from environments.d3il.d3il_sim.sims.sl.teleoperation.mockup_tests.follow_trajectory.trajectory_scheduler import (
+from d3il_sim.sims.sl.teleoperation.mockup_tests.follow_trajectory.trajectory_scheduler import (
     MetaTrajectoryScheduler,
 )
-from environments.d3il.d3il_sim.sims.sl.teleoperation.src.controller import teleop_controller as tele_ctrl
-from environments.d3il.d3il_sim.sims.sl.teleoperation.src.ui.cli_prompts import TrajectoryCliMap
-from environments.d3il.d3il_sim.sims.sl.teleoperation.src.util.teaching_log import TeleopMetaLogger
+from d3il_sim.sims.sl.teleoperation.src.controller import teleop_controller as tele_ctrl
+from d3il_sim.sims.sl.teleoperation.src.ui.cli_prompts import TrajectoryCliMap
+from d3il_sim.sims.sl.teleoperation.src.util.teaching_log import TeleopMetaLogger
 
 """
 Demo script for the Follow trajectory test: The primary robot follows a predefined trajectory; the replica robot follows

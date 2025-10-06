@@ -2,22 +2,22 @@ import sys
 
 import numpy as np
 
-from environments.d3il.d3il_sim.sims.mujoco.mj_interactive.ia_objects.pushing_object import (
+from d3il_sim.sims.mujoco.mj_interactive.ia_objects.pushing_object import (
     VirtualPushObject,
 )
-from environments.d3il.d3il_sim.sims.mujoco.mj_interactive.ia_robots.mj_push_robot import MjPushRobot
-from environments.d3il.d3il_sim.sims.SimFactory import SimRepository
-from environments.d3il.d3il_sim.sims.sl.teleoperation.demo_teacher import connect_sl_robot
-from environments.d3il.d3il_sim.sims.sl.teleoperation.src.controller import teleop_controller as tele_ctrl
-from environments.d3il.d3il_sim.sims.sl.teleoperation.src.controller.virtualtwin_controller import (
+from d3il_sim.sims.mujoco.mj_interactive.ia_robots.mj_push_robot import MjPushRobot
+from d3il_sim.sims.SimFactory import SimRepository
+from d3il_sim.sims.sl.teleoperation.demo_teacher import connect_sl_robot
+from d3il_sim.sims.sl.teleoperation.src.controller import teleop_controller as tele_ctrl
+from d3il_sim.sims.sl.teleoperation.src.controller.virtualtwin_controller import (
     VirtualTwinController,
 )
-from environments.d3il.d3il_sim.sims.sl.teleoperation.src.schedulers.virtualtwin_scheduler import (
+from d3il_sim.sims.sl.teleoperation.src.schedulers.virtualtwin_scheduler import (
     VirtualTwinMetaScheduler,
 )
-from environments.d3il.d3il_sim.sims.sl.teleoperation.src.ui.cli_prompts import HumanTeacherCliMap
-from environments.d3il.d3il_sim.sims.sl.teleoperation.src.util.teaching_log import TeleopMetaLogger
-from environments.d3il.d3il_sim.utils.geometric_transformation import euler2quat, quat2euler
+from d3il_sim.sims.sl.teleoperation.src.ui.cli_prompts import HumanTeacherCliMap
+from d3il_sim.sims.sl.teleoperation.src.util.teaching_log import TeleopMetaLogger
+from d3il_sim.utils.geometric_transformation import euler2quat, quat2euler
 
 
 def virtual_twin(seed=0, render=True, proc_id="", hint_alpha=0.3):

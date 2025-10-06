@@ -1,11 +1,11 @@
 import gin
 
 import environments.d3il.d3il_sim.sims.SimFactory as Sims
-from environments.d3il.d3il_sim.core import Camera, RobotBase, Scene
-from environments.d3il.d3il_sim.sims.sl.SlCamera import SlCamera
-from environments.d3il.d3il_sim.sims.sl.SlRobot import SlRobot
-from environments.d3il.d3il_sim.sims.sl.SlScene import SlScene
-from environments.d3il.d3il_sim.utils.sim_path import d3il_path
+from d3il_sim.core import Camera, RobotBase, Scene
+from d3il_sim.sims.sl.SlCamera import SlCamera
+from d3il_sim.sims.sl.SlRobot import SlRobot
+from d3il_sim.sims.sl.SlScene import SlScene
+from d3il_sim.utils.sim_path import d3il_path
 
 
 class SlFactory(Sims.SimFactory):

@@ -4,8 +4,8 @@ due to the 3D printed plate for inhand cameras.
 """
 import numpy as np
 
-from environments.d3il.d3il_sim.core import RobotBase
-from environments.d3il.d3il_sim.utils import geometric_transformation as geom
+from d3il_sim.core import RobotBase
+from d3il_sim.utils import geometric_transformation as geom
 
 # TCP is shifted by 5mm in global Z axis
 OFFSET_POS = np.array([0.0, 0.0, 0.005])

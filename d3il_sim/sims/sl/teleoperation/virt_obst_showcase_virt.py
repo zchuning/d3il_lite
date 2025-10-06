@@ -5,8 +5,8 @@ import numpy as np
 import pandas as pd
 from scipy.interpolate import make_interp_spline
 
-from environments.d3il.d3il_sim.sims.sl.teleoperation.demo_teacher import connect_sl_robot
-from environments.d3il.d3il_sim.sims.sl.teleoperation.virt_obst_sim import set_context, virtual_obst_setup
+from d3il_sim.sims.sl.teleoperation.demo_teacher import connect_sl_robot
+from d3il_sim.sims.sl.teleoperation.virt_obst_sim import set_context, virtual_obst_setup
 
 
 def play_scene(n, algo, seed):

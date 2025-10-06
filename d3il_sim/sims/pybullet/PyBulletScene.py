@@ -6,12 +6,12 @@ import numpy as np
 import pybullet as p
 from pybullet_utils.bullet_client import BulletClient
 
-from environments.d3il.d3il_sim.core import Scene
-from environments.d3il.d3il_sim.core.sim_object import IntelligentSimObject, SimObject
-from environments.d3il.d3il_sim.sims.pybullet.PybulletCamera import PbCageCam
-from environments.d3il.d3il_sim.sims.pybullet.PybulletLoadable import PybulletLoadable
-from environments.d3il.d3il_sim.utils.geometric_transformation import wxyz_to_xyzw, xyzw_to_wxyz
-from environments.d3il.d3il_sim.utils.sim_path import d3il_path
+from d3il_sim.core import Scene
+from d3il_sim.core.sim_object import IntelligentSimObject, SimObject
+from d3il_sim.sims.pybullet.PybulletCamera import PbCageCam
+from d3il_sim.sims.pybullet.PybulletLoadable import PybulletLoadable
+from d3il_sim.utils.geometric_transformation import wxyz_to_xyzw, xyzw_to_wxyz
+from d3il_sim.utils.sim_path import d3il_path
 
 PYBULLET = "pybullet"
 

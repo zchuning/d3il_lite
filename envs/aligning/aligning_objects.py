@@ -4,11 +4,11 @@ import numpy as np
 import xml.etree.ElementTree as Et
 from typing import Tuple
 
-from environments.d3il.d3il_sim.sims.mj_beta.mj_utils.mj_helper import IncludeType
-from environments.d3il.d3il_sim.sims.universal_sim.PrimitiveObjects import Box, Sphere
-from environments.d3il.d3il_sim.core.sim_object.sim_object import SimObject
-from environments.d3il.d3il_sim.sims.mj_beta.MjLoadable import MjXmlLoadable
-from environments.d3il.d3il_sim.utils import sim_path
+from d3il_sim.sims.mj_beta.mj_utils.mj_helper import IncludeType
+from d3il_sim.sims.universal_sim.PrimitiveObjects import Box, Sphere
+from d3il_sim.core.sim_object.sim_object import SimObject
+from d3il_sim.sims.mj_beta.MjLoadable import MjXmlLoadable
+from d3il_sim.utils import sim_path
 
 init_end_eff_pos = [0.525, -0.35, 0.25]
 

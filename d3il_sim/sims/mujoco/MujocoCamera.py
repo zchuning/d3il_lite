@@ -3,10 +3,10 @@ from xml.etree import ElementTree as Et
 
 import numpy as np
 
-from environments.d3il.d3il_sim.core.Camera import Camera
-from environments.d3il.d3il_sim.sims.mujoco.mj_utils import mujoco_render_singleton as mj_render
-from environments.d3il.d3il_sim.sims.mujoco.MujocoLoadable import MujocoLoadable
-from environments.d3il.d3il_sim.utils.geometric_transformation import (
+from d3il_sim.core.Camera import Camera
+from d3il_sim.sims.mujoco.mj_utils import mujoco_render_singleton as mj_render
+from d3il_sim.sims.mujoco.MujocoLoadable import MujocoLoadable
+from d3il_sim.utils.geometric_transformation import (
     mat2posQuat,
     mat2quat,
     posRotMat2TFMat,

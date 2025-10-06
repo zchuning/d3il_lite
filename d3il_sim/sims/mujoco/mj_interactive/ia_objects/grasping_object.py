@@ -1,8 +1,8 @@
 from typing import Tuple
 from xml.etree import ElementTree as Et
 
-from environments.d3il.d3il_sim.core.sim_object.sim_object import SimObject
-from environments.d3il.d3il_sim.sims.mujoco.MujocoLoadable import MujocoLoadable
+from d3il_sim.core.sim_object.sim_object import SimObject
+from d3il_sim.sims.mujoco.MujocoLoadable import MujocoLoadable
 
 
 class VirtualGraspObject(SimObject, MujocoLoadable):

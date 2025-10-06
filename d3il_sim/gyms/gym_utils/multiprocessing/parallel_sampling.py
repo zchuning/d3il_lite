@@ -5,7 +5,7 @@ from multiprocessing import Pipe, Process
 
 import numpy as np
 
-from environments.d3il.d3il_sim import gym
+from d3il_sim import gym
 
 
 def _subprocess_sampling(pipe, policy, env: gym.Env, n_steps: int):

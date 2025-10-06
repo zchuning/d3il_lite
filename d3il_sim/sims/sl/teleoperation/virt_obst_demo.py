@@ -2,17 +2,17 @@ import os
 
 import pandas as pd
 
-from environments.d3il.d3il_sim.sims.sl.teleoperation.demo_teacher import connect_sl_robot
-from environments.d3il.d3il_sim.sims.sl.teleoperation.src.controller import teleop_controller as tele_ctrl
-from environments.d3il.d3il_sim.sims.sl.teleoperation.src.controller.virtualtwin_controller import (
+from d3il_sim.sims.sl.teleoperation.demo_teacher import connect_sl_robot
+from d3il_sim.sims.sl.teleoperation.src.controller import teleop_controller as tele_ctrl
+from d3il_sim.sims.sl.teleoperation.src.controller.virtualtwin_controller import (
     VirtualTwinController,
 )
-from environments.d3il.d3il_sim.sims.sl.teleoperation.src.schedulers.virtualtwin_scheduler import (
+from d3il_sim.sims.sl.teleoperation.src.schedulers.virtualtwin_scheduler import (
     VirtualTwinMetaScheduler,
 )
-from environments.d3il.d3il_sim.sims.sl.teleoperation.src.ui.cli_prompts import HumanTeacherCliMap
-from environments.d3il.d3il_sim.sims.sl.teleoperation.src.util.teaching_log import TeleopMetaLogger
-from environments.d3il.d3il_sim.sims.sl.teleoperation.virt_obst_sim import remix_goal, virtual_obst_setup
+from d3il_sim.sims.sl.teleoperation.src.ui.cli_prompts import HumanTeacherCliMap
+from d3il_sim.sims.sl.teleoperation.src.util.teaching_log import TeleopMetaLogger
+from d3il_sim.sims.sl.teleoperation.virt_obst_sim import remix_goal, virtual_obst_setup
 
 DIRNAME = os.path.dirname(__file__)
 DATA_DIR = os.path.join(DIRNAME, "..", "data")

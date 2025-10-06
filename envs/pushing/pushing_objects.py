@@ -1,6 +1,6 @@
 import numpy as np
 
-from environments.d3il.d3il_sim.sims.universal_sim.PrimitiveObjects import Box, Sphere
+from d3il_sim.sims.universal_sim.PrimitiveObjects import Box, Sphere
 
 init_end_eff_pos = [0.525, -0.28, 0.12]
 # init_end_eff_pos = [0.4, -0.5, 0.12]

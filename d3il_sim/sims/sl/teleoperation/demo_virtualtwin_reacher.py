@@ -7,20 +7,20 @@ from tokenize import Number
 
 import numpy as np
 
-from environments.d3il.d3il_sim.sims.mujoco.mj_interactive.ia_robots.mj_push_robot import MjPushRobot
-from environments.d3il.d3il_sim.sims.SimFactory import SimRepository
-from environments.d3il.d3il_sim.sims.sl.teleoperation.demo_teacher import connect_sl_robot
-from environments.d3il.d3il_sim.sims.sl.teleoperation.src.controller import teleop_controller as tele_ctrl
-from environments.d3il.d3il_sim.sims.sl.teleoperation.src.controller.virtualtwin_controller import (
+from d3il_sim.sims.mujoco.mj_interactive.ia_robots.mj_push_robot import MjPushRobot
+from d3il_sim.sims.SimFactory import SimRepository
+from d3il_sim.sims.sl.teleoperation.demo_teacher import connect_sl_robot
+from d3il_sim.sims.sl.teleoperation.src.controller import teleop_controller as tele_ctrl
+from d3il_sim.sims.sl.teleoperation.src.controller.virtualtwin_controller import (
     VirtualTwinController,
 )
-from environments.d3il.d3il_sim.sims.sl.teleoperation.src.schedulers.virtualtwin_scheduler import (
+from d3il_sim.sims.sl.teleoperation.src.schedulers.virtualtwin_scheduler import (
     VirtualTwinMetaScheduler,
 )
-from environments.d3il.d3il_sim.sims.sl.teleoperation.src.ui.cli_prompts import HumanTeacherReacherCliMap
-from environments.d3il.d3il_sim.sims.sl.teleoperation.src.util.reacher_log import ReacherMetaLogger
-from environments.d3il.d3il_sim.sims.universal_sim.PrimitiveObjects import Sphere
-from environments.d3il.d3il_sim.utils.geometric_transformation import euler2quat
+from d3il_sim.sims.sl.teleoperation.src.ui.cli_prompts import HumanTeacherReacherCliMap
+from d3il_sim.sims.sl.teleoperation.src.util.reacher_log import ReacherMetaLogger
+from d3il_sim.sims.universal_sim.PrimitiveObjects import Sphere
+from d3il_sim.utils.geometric_transformation import euler2quat
 
 goal_positions = [[0.5, 0.2, 0.6], [0.3, -0.1, 0.3]]
 

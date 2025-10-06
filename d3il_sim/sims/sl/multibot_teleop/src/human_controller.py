@@ -1,8 +1,8 @@
 import numpy as np
 
-from environments.d3il.d3il_sim.controllers.Controller import ControllerBase
-from environments.d3il.d3il_sim.sims.sl.multibot_teleop.src.kalman_filter import KalmanFilter
-from environments.d3il.d3il_sim.sims.sl.SlRobot import SlRobot
+from d3il_sim.controllers.Controller import ControllerBase
+from d3il_sim.sims.sl.multibot_teleop.src.kalman_filter import KalmanFilter
+from d3il_sim.sims.sl.SlRobot import SlRobot
 
 
 class HumanController(ControllerBase):

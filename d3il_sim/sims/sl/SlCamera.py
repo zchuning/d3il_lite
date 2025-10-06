@@ -2,7 +2,7 @@ from typing import Tuple
 
 import numpy as np
 
-from environments.d3il.d3il_sim.core.Camera import Camera
+from d3il_sim.core.Camera import Camera
 
 
 class SlCamera(Camera):

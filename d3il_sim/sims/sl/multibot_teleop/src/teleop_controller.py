@@ -1,7 +1,7 @@
 import numpy as np
 
-from environments.d3il.d3il_sim.controllers.Controller import JointPDController
-from environments.d3il.d3il_sim.controllers.IKControllers import CartPosQuatImpedenceController
+from d3il_sim.controllers.Controller import JointPDController
+from d3il_sim.controllers.IKControllers import CartPosQuatImpedenceController
 
 
 class TeleopController(JointPDController):

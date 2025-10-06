@@ -3,7 +3,7 @@ import threading
 
 import numpy as np
 
-from environments.d3il.d3il_sim.sims.sl.multibot_teleop.src.force_feedback_controller import (
+from d3il_sim.sims.sl.multibot_teleop.src.force_feedback_controller import (
     ForceFeedbackController,
 )
 

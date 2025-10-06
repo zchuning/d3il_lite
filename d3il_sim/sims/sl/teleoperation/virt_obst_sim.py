@@ -1,13 +1,13 @@
 import numpy as np
 import pandas as pd
 
-from environments.d3il.d3il_sim.sims.mujoco.mj_interactive.ia_objects.pushing_object import (
+from d3il_sim.sims.mujoco.mj_interactive.ia_objects.pushing_object import (
     VirtualPushObject,
 )
-from environments.d3il.d3il_sim.sims.mujoco.mj_interactive.ia_robots.mj_push_robot import MjPushRobot
-from environments.d3il.d3il_sim.sims.SimFactory import SimRepository
-from environments.d3il.d3il_sim.sims.universal_sim.PrimitiveObjects import Cylinder, Sphere
-from environments.d3il.d3il_sim.utils.geometric_transformation import euler2quat
+from d3il_sim.sims.mujoco.mj_interactive.ia_robots.mj_push_robot import MjPushRobot
+from d3il_sim.sims.SimFactory import SimRepository
+from d3il_sim.sims.universal_sim.PrimitiveObjects import Cylinder, Sphere
+from d3il_sim.utils.geometric_transformation import euler2quat
 
 GOAL_Y = 0.5
 GOAL_X_BOUNDS = [0.25, 0.7]
