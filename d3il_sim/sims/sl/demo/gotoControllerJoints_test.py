@@ -1,6 +1,6 @@
 import numpy as np
 
-from environments.d3il.d3il_sim.core.logger import RobotPlotFlags
+from environments.d3il.d3il_sim.core.Logger import RobotPlotFlags
 from environments.d3il.d3il_sim.sims.SimFactory import SimRepository
 
 if __name__ == "__main__":

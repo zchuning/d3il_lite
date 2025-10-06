@@ -6,7 +6,7 @@ import numpy as np
 from gym.spaces import Box
 
 from environments.d3il.d3il_sim.core import Scene
-from environments.d3il.d3il_sim.core.logger import CamLogger, ObjectLogger
+from environments.d3il.d3il_sim.core.Logger import CamLogger, ObjectLogger
 from environments.d3il.d3il_sim.gyms.gym_env_wrapper import GymEnvWrapper
 from environments.d3il.d3il_sim.gyms.gym_utils.helpers import obj_distance
 from environments.d3il.d3il_sim.sims import MjCamera

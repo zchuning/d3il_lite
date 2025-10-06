@@ -5,7 +5,7 @@ from environments.d3il.d3il_sim.utils.sim_path import d3il_path
 
 from environments.d3il.d3il_sim.core import Scene
 from environments.d3il.d3il_sim.gyms.gym_env_wrapper import GymEnvWrapper
-from environments.d3il.d3il_sim.core.logger import ObjectLogger, CamLogger
+from environments.d3il.d3il_sim.core.Logger import ObjectLogger, CamLogger
 from environments.d3il.d3il_sim.sims.mj_beta.MjRobot import MjRobot
 from environments.d3il.d3il_sim.sims.mj_beta.MjFactory import MjFactory
 from environments.d3il.d3il_sim.sims import MjCamera
