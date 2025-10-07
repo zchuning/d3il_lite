@@ -60,25 +60,7 @@ class GymEnvWrapper(gym.Env, ABC):
         """
         if gripper_width is not None:
             self.robot.set_gripper_width = gripper_width
-
-        # self.controller.set_action(action)
-        # self.controller.execute_action(n_time_steps=self.n_substeps)
-
         self.robot.open_fingers()
-
-        # self.robot.cartesianPosQuatTrackingController.setSetPoint(action)
-        # self.robot.cartesianPosQuatTrackingController.executeControllerTimeSteps(
-        #     self.robot, self.n_substeps, block=False
-        # )
-
-        # if self.env_step_counter == 0:
-        #     action = self.robot.current_c_pos[:2] + action
-        # else:
-        #     action = self.robot.des_c_pos[:2] + action
-        #
-        # action[0] = np.clip(action[0], 0.3, 0.8)
-        # action[1] = np.clip(action[1], -0.45, 0.45)
-        # action = np.concatenate((action, [0.12, 0, 1, 0, 0]))
 
         self.controller.setSetPoint(action)
         self.controller.executeControllerTimeSteps(
@@ -87,7 +69,7 @@ class GymEnvWrapper(gym.Env, ABC):
 
         observation = self.get_observation()
         reward = self.get_reward()
-        done = self.is_finished()
+        terminated = self.is_finished()
 
         for i in range(self.n_substeps):
             self.scene.next_step()
@@ -97,7 +79,7 @@ class GymEnvWrapper(gym.Env, ABC):
             debug_info = self.debug_msg()
 
         self.env_step_counter += 1
-        return observation, reward, done, debug_info
+        return observation, reward, terminated, False, debug_info
 
     @abstractmethod
     def get_observation(self) -> np.ndarray:
@@ -154,8 +136,7 @@ class GymEnvWrapper(gym.Env, ABC):
         self.env_step_counter = 0
         self.episode += 1
         obs = self._reset_env()
-
-        return obs
+        return obs, {}
 
     def robot_state(self):
         # Update Robot State
@@ -175,15 +156,3 @@ class GymEnvWrapper(gym.Env, ABC):
         tcp_quad = self.robot.current_c_quat
 
         return tcp_pos
-
-        # return np.concatenate(
-        #     [
-        #         joint_pos,
-        #         joint_vel,
-        #         gripper_vel,
-        #         gripper_width,
-        #         tcp_pos,
-        #         tcp_vel,
-        #         tcp_quad,
-        #     ]
-        # )

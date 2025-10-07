@@ -160,10 +160,10 @@ class AligningEnv(GymEnvWrapper):
         self.if_vision = if_vision
 
         self.action_space = Box(
-            low=np.array([-0.01, -0.01]), high=np.array([0.01, 0.01])
+            low=np.array([-0.01, -0.01, -0.01]), high=np.array([0.01, 0.01, 0.01])
         )
         self.observation_space = Box(
-            low=-np.inf, high=np.inf, shape=(8, )
+            low=-np.inf, high=np.inf, shape=(17, )
         )
 
         self.interactive = interactive
@@ -216,7 +216,7 @@ class AligningEnv(GymEnvWrapper):
 
             return robot_pos, bp_image, inhand_image
 
-        box_pos = self.scene.get_obj_pos(self.push_box)  # - robot_pos
+        box_pos = self.scene.get_obj_pos(self.push_box)
         box_quat = self.scene.get_obj_quat(self.push_box)
 
         target_pos = self.scene.get_obj_pos(self.target_box)
@@ -232,31 +232,20 @@ class AligningEnv(GymEnvWrapper):
             ]
         )
 
-        return env_state.astype(np.float32)#, bp_image, inhand_image
+        return env_state.astype(np.float32)
 
     def start(self):
         self.scene.start()
 
         # reset view of the camera
         if self.scene.viewer is not None:
-            # self.scene.viewer.cam.elevation = -55
-            # self.scene.viewer.cam.distance = 1.7
-            # self.scene.viewer.cam.lookat[0] += -0.1
-            # self.scene.viewer.cam.lookat[2] -= 0.2
-
             self.scene.viewer.cam.elevation = -55
             self.scene.viewer.cam.distance = 2.0
             self.scene.viewer.cam.lookat[0] += 0
             self.scene.viewer.cam.lookat[2] -= 0.2
 
-            # self.scene.viewer.cam.elevation = -60
-            # self.scene.viewer.cam.distance = 1.6
-            # self.scene.viewer.cam.lookat[0] += 0.05
-            # self.scene.viewer.cam.lookat[2] -= 0.1
-
         # reset the initial state of the robot
         initial_cart_position = copy.deepcopy(init_end_eff_pos)
-        # initial_cart_position[2] = 0.12
         self.robot.gotoCartPosQuatController.setDesiredPos(
             [
                 initial_cart_position[0],
@@ -269,28 +258,24 @@ class AligningEnv(GymEnvWrapper):
             ]
         )
         self.robot.gotoCartPosQuatController.initController(self.robot, 1)
-
         self.robot.init_qpos = self.robot.gotoCartPosQuatController.trajectory[
             -1
         ].copy()
         self.robot.init_tcp_pos = initial_cart_position
         self.robot.init_tcp_quat = [0, 1, 0, 0]
-
         self.robot.beam_to_joint_pos(
             self.robot.gotoCartPosQuatController.trajectory[-1]
         )
-        # self.robot.gotoJointPosition(self.robot.init_qpos, duration=0.05)
-        # self.robot.wait(duration=2.0)
-
         self.robot.gotoCartPositionAndQuat(
             desiredPos=initial_cart_position, desiredQuat=[0, 1, 0, 0], duration=0.5, log=False
         )
 
     def step(self, action, gripper_width=None, desired_vel=None, desired_acc=None):
-        observation, reward, done, _ = super().step(action, gripper_width, desired_vel=desired_vel, desired_acc=desired_acc)
+        action = np.concatenate([action, [0, 1, 0, 0]], axis=0)
+        observation, reward, terminated, truncated, _ = super().step(action, gripper_width, desired_vel=desired_vel, desired_acc=desired_acc)
         self.success = self._check_early_termination()
         mode, mean_distance = self.check_mode()
-        return observation, reward, done, {'mode': mode, 'success':  self.success, 'mean_distance': mean_distance}
+        return observation, reward, terminated, truncated, {'mode': mode, 'success':  self.success, 'mean_distance': mean_distance}
 
     def check_mode(self):
 
@@ -360,7 +345,7 @@ class AligningEnv(GymEnvWrapper):
         self.bp_mode = None
         obs = self._reset_env(random=random, context=context)
 
-        return obs
+        return obs, {}
 
     def _reset_env(self, random=True, context=None):
 
@@ -379,11 +364,3 @@ class AligningEnv(GymEnvWrapper):
         observation = self.get_observation()
 
         return observation
-
-        # if self.random_env:
-        #     new_box1 = [self.push_box1, self.push_box1_space.sample()]
-        #     new_box2 = [self.push_box2, self.push_box2_space.sample()]
-        #
-        #     self.scene.reset([new_box1, new_box2])
-        # else:
-        #     self.scene.reset()
