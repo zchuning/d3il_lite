@@ -49,7 +49,7 @@ class ObstacleAvoidanceManager:
         pass
 
 
-class ObstacleAvoidanceEnv(GymEnvWrapper):
+class AvoidingEnv(GymEnvWrapper):
     def __init__(
             self,
             n_substeps: int = 35,

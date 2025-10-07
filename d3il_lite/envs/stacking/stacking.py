@@ -132,7 +132,7 @@ class BlockContextManager:
         self.index = index
 
 
-class CubeStacking_Env(GymEnvWrapper):
+class StackingEnv(GymEnvWrapper):
     def __init__(
         self,
         n_substeps: int = 30,

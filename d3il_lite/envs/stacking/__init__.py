@@ -1,1 +1,1 @@
-from .stacking import CubeStacking_Env
+from .stacking import StackingEnv

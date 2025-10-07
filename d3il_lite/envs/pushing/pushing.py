@@ -168,7 +168,7 @@ class BlockContextManager:
         self.index = index
 
 
-class Block_Push_Env(GymEnvWrapper):
+class PushingEnv(GymEnvWrapper):
     def __init__(
         self,
         n_substeps: int = 35,

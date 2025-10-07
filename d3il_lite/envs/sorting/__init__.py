@@ -1,1 +1,1 @@
-from .sorting import Sorting_Env
+from .sorting import SortingEnv

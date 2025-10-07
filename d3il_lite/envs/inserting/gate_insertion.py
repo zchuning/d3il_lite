@@ -151,7 +151,7 @@ class BlockContextManager:
         self.index = index
 
 
-class Gate_Insertion_Env(GymEnvWrapper):
+class InsertingEnv(GymEnvWrapper):
     def __init__(
         self,
         n_substeps: int = 35,

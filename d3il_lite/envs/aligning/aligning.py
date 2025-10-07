@@ -126,7 +126,7 @@ class BlockContextManager:
         self.index = index
 
 
-class Robot_Push_Env(GymEnvWrapper):
+class AligningEnv(GymEnvWrapper):
     def __init__(
         self,
         n_substeps: int = 35,

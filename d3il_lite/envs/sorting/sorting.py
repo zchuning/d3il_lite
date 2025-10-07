@@ -190,7 +190,7 @@ class BlockContextManager:
         self.index = index
 
 
-class Sorting_Env(GymEnvWrapper):
+class SortingEnv(GymEnvWrapper):
     def __init__(
         self,
         n_substeps: int = 35,

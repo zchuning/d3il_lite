@@ -1,1 +1,1 @@
-from .avoiding import ObstacleAvoidanceEnv
+from .avoiding import AvoidingEnv
