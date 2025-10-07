@@ -2,11 +2,11 @@ from enum import Enum, auto
 
 import numpy as np
 
-import environments.d3il.d3il_sim.controllers as ctrl
-import environments.d3il.d3il_sim.core.Logger as logger
-import environments.d3il.d3il_sim.core.Model as model
-import environments.d3il.d3il_sim.core.TimeKeeper as time_keeper
-import environments.d3il.d3il_sim.utils.geometric_transformation as geom_trans
+import d3il_lite.d3il_sim.controllers as ctrl
+import d3il_lite.d3il_sim.core.Logger as logger
+import d3il_lite.d3il_sim.core.Model as model
+import d3il_lite.d3il_sim.core.TimeKeeper as time_keeper
+import d3il_lite.d3il_sim.utils.geometric_transformation as geom_trans
 
 
 class RobotControlInterface(Enum):

@@ -7,7 +7,7 @@ Simplifies installation so no need to install individual environments.
 
 ```
 SimulationFramework
-└── environments.d3il.d3il_sim # basic simulation code, including robots, robot controller, camera, etc.
+└── d3il_lite.d3il_sim # basic simulation code, including robots, robot controller, camera, etc.
     └── controllers
     └── core
     └── gyms

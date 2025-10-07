@@ -1,4 +1,4 @@
-import environments.d3il.d3il_sim.sims.SimFactory as sims
+import d3il_lite.d3il_sim.sims.SimFactory as sims
 from d3il_lite.d3il_sim.sims.sl.teleoperation.src.controller.human_controller import (
     HumanController,
 )

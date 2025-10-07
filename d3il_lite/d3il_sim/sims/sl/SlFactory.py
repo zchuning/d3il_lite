@@ -1,6 +1,6 @@
 import gin
 
-import environments.d3il.d3il_sim.sims.SimFactory as Sims
+import d3il_lite.d3il_sim.sims.SimFactory as Sims
 from d3il_lite.d3il_sim.core import Camera, RobotBase, Scene
 from d3il_lite.d3il_sim.sims.sl.SlCamera import SlCamera
 from d3il_lite.d3il_sim.sims.sl.SlRobot import SlRobot

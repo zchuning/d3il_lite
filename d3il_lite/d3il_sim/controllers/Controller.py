@@ -3,7 +3,7 @@ from abc import abstractmethod
 
 import numpy as np
 
-import environments.d3il.d3il_sim.controllers.GainsInterface as gains
+import d3il_lite.d3il_sim.controllers.GainsInterface as gains
 
 
 class ControllerBase:

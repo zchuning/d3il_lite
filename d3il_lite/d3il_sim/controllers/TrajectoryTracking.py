@@ -6,7 +6,7 @@ import logging
 import numpy as np
 from scipy.interpolate import make_interp_spline
 
-import environments.d3il.d3il_sim.utils as utils
+import d3il_lite.d3il_sim.utils as utils
 from d3il_lite.d3il_sim.controllers import ControllerBase
 
 
