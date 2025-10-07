@@ -483,7 +483,7 @@ class InsertingEnv(GymEnvWrapper):
 
         return False
 
-    def reset(self, random=True, context=None):
+    def reset(self, seed=None, options=None, random=True, context=None):
         self.terminated = False
         self.env_step_counter = 0
         self.episode += 1

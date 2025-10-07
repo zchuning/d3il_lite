@@ -149,7 +149,7 @@ class GymEnvWrapper(gym.Env, ABC):
     def _reset_env(self):
         raise NotImplementedError
 
-    def reset(self):
+    def reset(self, seed=None, options=None):
         self.terminated = False
         self.env_step_counter = 0
         self.episode += 1
