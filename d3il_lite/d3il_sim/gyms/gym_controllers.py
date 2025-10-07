@@ -1,6 +1,6 @@
 import abc
 
-import gym
+import gymnasium as gym
 import numpy as np
 
 import d3il_lite.d3il_sim.controllers.Controller as ctrl
