@@ -39,7 +39,7 @@ class MjSceneParser:
         if not isinstance(object_list, list):
             object_list = [object_list]
 
-        all_objects = chain([mj_surrounding], object_list, mj_robots)
+        all_objects = [mj_surrounding] + object_list + mj_robots
 
         for obj in all_objects:
             self.load_mj_loadable(obj)
