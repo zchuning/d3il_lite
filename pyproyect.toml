@@ -1,17 +1,42 @@
 [build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
-]
+requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "d3il_lite"
+version = "0.1.0"
+description = "A lightweight version of D3IL benchmark."
+readme = "README.md"
+requires-python = ">=3.12.9"
+
+authors = [
+  { name = "Chuning Zhu" },
+]
+
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Operating System :: OS Independent"
+]
+
+dependencies = [
+  "mujoco==3.3.6",
+  "gymnasium==1.1.1",
+  "pin",
+  "gin-config",
+]
+
+# Auto-discover all packages under d3il_lite/
+[tool.setuptools.packages.find]
+include = ["d3il_lite*"]
 
 [tool.black]
 line-length = 100
 exclude = '''
 (
   /(
-      .eggs         # exclude a few common directories in the
-    | .git          # root of the project
+      .eggs
+    | .git
     | .mypy_cache
     | docs
     | *personal*

@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import copy
 
-from gym.spaces import Box
+from gymnasium.spaces import Box
 
 from d3il_lite.d3il_sim.utils.sim_path import d3il_path
 from d3il_lite.d3il_sim.core import Scene
@@ -14,7 +14,7 @@ from d3il_lite.d3il_sim.sims.mj_beta.MjRobot import MjRobot
 from d3il_lite.d3il_sim.sims.mj_beta.MjFactory import MjFactory
 from d3il_lite.d3il_sim.sims import MjCamera
 
-from .objects.aligning_objects import get_obj_list, init_end_eff_pos
+from .aligning_objects import get_obj_list, init_end_eff_pos
 
 obj_list = get_obj_list()
 

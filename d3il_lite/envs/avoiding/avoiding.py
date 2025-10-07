@@ -10,9 +10,7 @@ from d3il_lite.d3il_sim.sims.mj_beta.MjRobot import MjRobot
 from d3il_lite.d3il_sim.sims.mj_beta.MjFactory import MjFactory
 from d3il_lite.d3il_sim.sims import MjCamera
 
-from .objects.avoiding_objects import get_obj_list, \
-    init_end_eff_pos, \
-    get_obj_xy_list
+from .avoiding_objects import get_obj_list, init_end_eff_pos, get_obj_xy_list
 
 obj_list = get_obj_list()
 

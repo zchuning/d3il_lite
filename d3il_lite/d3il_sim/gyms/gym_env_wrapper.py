@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 import gymnasium as gym
-from gymnasum.utils import seeding
+from gymnasium.utils import seeding
 import numpy as np
 
 from d3il_lite.d3il_sim.controllers.Controller import ControllerBase

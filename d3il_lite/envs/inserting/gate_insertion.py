@@ -4,7 +4,7 @@ import time
 
 import sys
 
-from gym.spaces import Box
+from gymnasium.spaces import Box
 
 from d3il_lite.d3il_sim.utils.sim_path import d3il_path
 from d3il_lite.d3il_sim.controllers.Controller import ControllerBase
@@ -19,7 +19,7 @@ from d3il_lite.d3il_sim.sims.mj_beta.MjFactory import MjFactory
 from d3il_lite.d3il_sim.sims import MjCamera
 
 from d3il_lite.d3il_sim.gyms.gym_controllers import GymCartesianVelController
-from .objects.gate_insertion_objects import get_obj_list, init_end_eff_pos
+from .gate_insertion_objects import get_obj_list, init_end_eff_pos
 
 obj_list, push_box1, push_box2, push_box3, target_box1, target_box2, target_box3, maze = get_obj_list()
 

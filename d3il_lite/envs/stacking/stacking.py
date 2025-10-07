@@ -3,7 +3,7 @@ import copy
 
 import cv2
 import numpy as np
-from gym.spaces import Box
+from gymnasium.spaces import Box
 
 from d3il_lite.d3il_sim.core import Scene
 from d3il_lite.d3il_sim.core.Logger import CamLogger, ObjectLogger
@@ -16,7 +16,7 @@ from d3il_lite.d3il_sim.utils.geometric_transformation import (
     euler2quat, quat2euler)
 from d3il_lite.d3il_sim.utils.sim_path import d3il_path
 
-from .objects.stacking_objects import get_obj_list, init_end_eff_pos
+from .stacking_objects import get_obj_list, init_end_eff_pos
 
 obj_list = get_obj_list()
 
