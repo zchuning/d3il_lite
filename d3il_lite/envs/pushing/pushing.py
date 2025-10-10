@@ -1,21 +1,22 @@
-import numpy as np
 import copy
+import sys
 import time
 
-import sys
-
+import numpy as np
 from gymnasium.spaces import Box
 
-from d3il_lite.d3il_sim.utils.sim_path import d3il_path
 from d3il_lite.d3il_sim.core import Scene
-from d3il_lite.d3il_sim.core.Logger import ObjectLogger, CamLogger
+from d3il_lite.d3il_sim.core.Logger import CamLogger, ObjectLogger
 from d3il_lite.d3il_sim.gyms.gym_env_wrapper import GymEnvWrapper
 from d3il_lite.d3il_sim.gyms.gym_utils.helpers import obj_distance
-from d3il_lite.d3il_sim.utils.geometric_transformation import euler2quat, quat2euler
-
-from d3il_lite.d3il_sim.sims.mj_beta.MjRobot import MjRobot
-from d3il_lite.d3il_sim.sims.mj_beta.MjFactory import MjFactory
 from d3il_lite.d3il_sim.sims import MjCamera
+from d3il_lite.d3il_sim.sims.mj_beta.MjFactory import MjFactory
+from d3il_lite.d3il_sim.sims.mj_beta.MjRobot import MjRobot
+from d3il_lite.d3il_sim.utils.geometric_transformation import (
+    euler2quat,
+    quat2euler,
+)
+from d3il_lite.d3il_sim.utils.sim_path import d3il_path
 
 from .pushing_objects import get_obj_list, init_end_eff_pos
 
@@ -51,16 +52,13 @@ class BlockContextManager:
         np.random.seed(seed)
 
         self.red_box_space = Box(
-            low=np.array([0.4, -0.15, -90]), high=np.array([0.5, 0, 90])#, seed=seed
+            low=np.array([0.4, -0.15, -90]),
+            high=np.array([0.5, 0, 90]),  # seed=seed
         )
         self.green_box_space = Box(
-            low=np.array([0.55, -0.15, -90]), high=np.array([0.65, 0, 90])#, seed=seed
+            low=np.array([0.55, -0.15, -90]),
+            high=np.array([0.65, 0, 90]),  # seed=seed
         )
-
-        # self.deg_list = np.random.random_sample(60) * 180 - 90
-        # self.x1_list = np.random.random_sample(30) * 0.1 + 0.4
-        # self.x2_list = np.random.random_sample(30) * 0.1 + 0.55
-        # self.y_list = np.random.random_sample(60) * 0.2 - 0.15
 
         # Reduced context space size
         self.deg_list = np.random.random_sample(60) * 90 - 45
@@ -68,14 +66,9 @@ class BlockContextManager:
         self.x2_list = np.random.random_sample(30) * 0.1 + 0.55
         self.y_list = np.random.random_sample(60) * 0.15 - 0.15
 
-        # 0, rr_gg
-        # 1, gg_rr
-        # 2, rg_gr
-        # 3, gr_rg
         self.index = index
 
     def start(self, random=True, context=None):
-
         if random:
             self.context = self.sample()
         else:
@@ -84,7 +77,6 @@ class BlockContextManager:
         self.set_context(self.context)
 
     def sample(self):
-
         red_pos = self.red_box_space.sample()
         green_pos = self.green_box_space.sample()
 
@@ -97,7 +89,6 @@ class BlockContextManager:
         return [red_pos, quat, green_pos, quat2]
 
     def set_context(self, context):
-
         red_pos, quat, green_pos, quat2 = context
 
         self.scene.set_obj_pos_and_quat(
@@ -111,14 +102,8 @@ class BlockContextManager:
             quat2,
             obj_name="push_box2",
         )
-        # print(
-        #     "Set Context red_pos: {}, quat_r: {}, green_pos: {}, quat_g: {}".format(
-        #         red_pos, quat, green_pos, quat2
-        #     )
-        # )
 
     def random_context(self):
-
         red_pos = self.red_box_space.sample()
         green_pos = self.green_box_space.sample()
 
@@ -158,7 +143,6 @@ class BlockContextManager:
             quat2,
             obj_name="push_box2",
         )
-        # print("Set Context {}".format(index))
 
     def next_context(self):
         self.index = (self.index + 1) % len(self.x1_list)
@@ -176,7 +160,7 @@ class PushingEnv(GymEnvWrapper):
         debug: bool = False,
         random_env: bool = False,
         interactive: bool = False,
-        render: bool = True
+        render: bool = True,
     ):
 
         sim_factory = MjFactory()
@@ -189,8 +173,6 @@ class PushingEnv(GymEnvWrapper):
             xml_path=d3il_path("./models/mj/robot/panda_rod_invisible.xml"),
         )
         controller = robot.cartesianPosQuatTrackingController
-        # controller = robot.jointTrackingController
-        # controller = GymCartesianVelController(robot, fixed_orientation=[0,1,0,0])
 
         super().__init__(
             scene=scene,
@@ -203,9 +185,7 @@ class PushingEnv(GymEnvWrapper):
         self.action_space = Box(
             low=np.array([-0.01, -0.01]), high=np.array([0.01, 0.01])
         )
-        self.observation_space = Box(
-            low=-np.inf, high=np.inf, shape=(14, )
-        )
+        self.observation_space = Box(low=-np.inf, high=np.inf, shape=(14,))
 
         self.interactive = interactive
 
@@ -239,7 +219,7 @@ class PushingEnv(GymEnvWrapper):
 
         self.cam_dict = {
             "bp-cam": CamLogger(scene, self.bp_cam),
-            "inhand-cam": CamLogger(scene, self.inhand_cam)
+            "inhand-cam": CamLogger(scene, self.inhand_cam),
         }
 
         for _, v in self.log_dict.items():
@@ -253,7 +233,6 @@ class PushingEnv(GymEnvWrapper):
         self.first_visit = -1
 
     def get_observation(self) -> np.ndarray:
-
         robot_pos = self.robot_state()[:2]
 
         box_1_pos = self.scene.get_obj_pos(self.push_box1)[:2]  # - robot_pos
@@ -262,9 +241,6 @@ class PushingEnv(GymEnvWrapper):
         box_2_pos = self.scene.get_obj_pos(self.push_box2)[:2]  # - robot_pos
         box_2_quat = np.tan(quat2euler(self.scene.get_obj_quat(self.push_box2))[-1:])
 
-        # goal_1_pos = self.scene.get_obj_pos(self.target_box_1)[:2]  # - robot_pos
-        # goal_2_pos = self.scene.get_obj_pos(self.target_box_2)[:2]  # - robot_pos
-
         env_state = np.concatenate(
             [
                 robot_pos,
@@ -272,37 +248,23 @@ class PushingEnv(GymEnvWrapper):
                 box_1_quat,
                 box_2_pos,
                 box_2_quat,
-                # goal_1_pos,
-                # goal_2_pos,
             ]
         )
 
         return env_state.astype(np.float32)
-        # return np.concatenate([robot_state, env_state])
 
     def start(self):
         self.scene.start()
 
         # reset view of the camera
         if self.scene.viewer is not None:
-            # self.scene.viewer.cam.elevation = -55
-            # self.scene.viewer.cam.distance = 1.7
-            # self.scene.viewer.cam.lookat[0] += -0.1
-            # self.scene.viewer.cam.lookat[2] -= 0.2
-
             self.scene.viewer.cam.elevation = -55
             self.scene.viewer.cam.distance = 2.0
             self.scene.viewer.cam.lookat[0] += 0
             self.scene.viewer.cam.lookat[2] -= 0.2
 
-            # self.scene.viewer.cam.elevation = -60
-            # self.scene.viewer.cam.distance = 1.6
-            # self.scene.viewer.cam.lookat[0] += 0.05
-            # self.scene.viewer.cam.lookat[2] -= 0.1
-
         # reset the initial state of the robot
         initial_cart_position = copy.deepcopy(init_end_eff_pos)
-        # initial_cart_position[2] = 0.12
         self.robot.gotoCartPosQuatController.setDesiredPos(
             [
                 initial_cart_position[0],
@@ -325,18 +287,34 @@ class PushingEnv(GymEnvWrapper):
         self.robot.beam_to_joint_pos(
             self.robot.gotoCartPosQuatController.trajectory[-1]
         )
-        # self.robot.gotoJointPosition(self.robot.init_qpos, duration=0.05)
-        # self.robot.wait(duration=2.0)
 
         self.robot.gotoCartPositionAndQuat(
-            desiredPos=initial_cart_position, desiredQuat=[0, 1, 0, 0], duration=0.5, log=False
+            desiredPos=initial_cart_position,
+            desiredQuat=[0, 1, 0, 0],
+            duration=0.5,
+            log=False,
         )
 
     def step(self, action, gripper_width=None, desired_vel=None, desired_acc=None):
-        observation, reward, done, _ = super().step(action, gripper_width, desired_vel=desired_vel, desired_acc=desired_acc)
+        observation, reward, terminated, truncated, _ = super().step(
+            action,
+            gripper_width,
+            desired_vel=desired_vel,
+            desired_acc=desired_acc,
+        )
         self.success = self._check_early_termination()
         mode, mean_distance = self.check_mode()
-        return observation, reward, done, {'mode': mode, 'success':  self.success, 'mean_distance': mean_distance}
+        return (
+            observation,
+            reward,
+            terminated,
+            truncated,
+            {
+                "mode": mode,
+                "success": self.success,
+                "mean_distance": mean_distance,
+            },
+        )
 
     def check_mode(self):
         box_1_pos = self.scene.get_obj_pos(self.push_box1)
@@ -377,7 +355,6 @@ class PushingEnv(GymEnvWrapper):
         return mode, mean_distance
 
     def get_reward(self, if_sparse=False):
-        # return 0
         if if_sparse:
             return 0
 
@@ -396,46 +373,7 @@ class PushingEnv(GymEnvWrapper):
         dis_gr, _ = obj_distance(box_2_pos, goal_1_pos)
         dis_gg, _ = obj_distance(box_2_pos, goal_2_pos)
 
-        # reward for pushing red box to red target area.
-
-        # reward_red = 5 - (dis_robot_box_r + dis_rr)
-        # reward_red = reward_red if reward_red > 0 else 0
-
-        # reward_green = 100 - (dis_robot_box_g + dis_gg) * 3
-        # reward_green = reward_green if reward_green > 50 else 50
-
         return (-1) * (dis_robot_box_r + dis_rr)
-
-        # if dis_rr > self.target_min_dist:
-        #     robot_factor = 1
-        # else:
-        #     robot_factor = 0
-        #
-        # return (-1) * (dis_robot_box_r * robot_factor + dis_rr - 2) + (-1) * (dis_robot_box_g * (1 - robot_factor) + dis_gg)
-
-        # # reward for pushing two boxes
-        # if dis_rr > self.target_min_dist:
-        #
-        #     self.reward_offset = dis_robot_box_g + dis_gg
-        #
-        #     return (-1) * (dis_robot_box_r + dis_rr)
-        #
-        # else:
-        #     return (-1) * (dis_robot_box_g + dis_gg) + self.reward_offset
-
-        dis_modes = np.array([dis_rr, dis_rg, dis_gr, dis_gg])
-
-        min_ind = np.argmin(dis_modes)
-
-        # four modes: [rr, gg], [rg, gr], [gr, rg], [gg, rr]
-        min_dis = dis_modes[min_ind]
-        if self.bp_mode is None and min_dis <= self.target_min_dist:
-            self.bp_mode = min_ind
-
-        if min_ind == 0 or min_ind == 3:
-            return (-1) * (dis_rr + dis_gg)
-        else:
-            return (-1) * (dis_rg + dis_gr)
 
     def _check_early_termination(self) -> bool:
         # calculate the distance from end effector to object
@@ -467,10 +405,9 @@ class PushingEnv(GymEnvWrapper):
         self.bp_mode = None
         obs = self._reset_env(random=random, context=context)
 
-        return obs
+        return obs, {}
 
     def _reset_env(self, random=True, context=None):
-
         if self.interactive:
             for log_name, s in self.cam_dict.items():
                 s.reset()
@@ -486,11 +423,3 @@ class PushingEnv(GymEnvWrapper):
         observation = self.get_observation()
 
         return observation
-
-        # if self.random_env:
-        #     new_box1 = [self.push_box1, self.push_box1_space.sample()]
-        #     new_box2 = [self.push_box2, self.push_box2_space.sample()]
-        #
-        #     self.scene.reset([new_box1, new_box2])
-        # else:
-        #     self.scene.reset()

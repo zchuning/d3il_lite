@@ -1,20 +1,21 @@
+import copy
 import random
 
 import cv2
 import numpy as np
-import copy
-
 from gymnasium.spaces import Box
 
-from d3il_lite.d3il_sim.utils.sim_path import d3il_path
 from d3il_lite.d3il_sim.core import Scene
-from d3il_lite.d3il_sim.core.Logger import ObjectLogger, CamLogger
+from d3il_lite.d3il_sim.core.Logger import CamLogger, ObjectLogger
 from d3il_lite.d3il_sim.gyms.gym_env_wrapper import GymEnvWrapper
-from d3il_lite.d3il_sim.utils.geometric_transformation import euler2quat, quat2euler
-
-from d3il_lite.d3il_sim.sims.mj_beta.MjRobot import MjRobot
-from d3il_lite.d3il_sim.sims.mj_beta.MjFactory import MjFactory
 from d3il_lite.d3il_sim.sims import MjCamera
+from d3il_lite.d3il_sim.sims.mj_beta.MjFactory import MjFactory
+from d3il_lite.d3il_sim.sims.mj_beta.MjRobot import MjRobot
+from d3il_lite.d3il_sim.utils.geometric_transformation import (
+    euler2quat,
+    quat2euler,
+)
+from d3il_lite.d3il_sim.utils.sim_path import d3il_path
 
 from .sorting_objects import get_obj_list, init_end_eff_pos
 
@@ -50,34 +51,39 @@ class BlockContextManager:
         np.random.seed(seed)
 
         self.box1_space = Box(
-            low=np.array([0.4, -0.15, -90]), high=np.array([0.5, -0.1, 90])  # , seed=seed
+            low=np.array([0.4, -0.15, -90]),
+            high=np.array([0.5, -0.1, 90]),  # seed=seed
         )
 
         self.box2_space = Box(
-            low=np.array([0.4, -0.05, -90]), high=np.array([0.5, 0, 90])  # , seed=seed
+            low=np.array([0.4, -0.05, -90]),
+            high=np.array([0.5, 0, 90]),  # seed=seed
         )
 
         self.box3_space = Box(
-            low=np.array([0.4, 0.05, -90]), high=np.array([0.5, 0.1, 90])  # , seed=seed
+            low=np.array([0.4, 0.05, -90]),
+            high=np.array([0.5, 0.1, 90]),  # seed=seed
         )
 
         self.box4_space = Box(
-            low=np.array([0.55, -0.15, -90]), high=np.array([0.65, -0.1, 90])  # , seed=seed
+            low=np.array([0.55, -0.15, -90]),
+            high=np.array([0.65, -0.1, 90]),  # seed=seed
         )
 
         self.box5_space = Box(
-            low=np.array([0.55, -0.05, -90]), high=np.array([0.65, 0, 90])  # , seed=seed
+            low=np.array([0.55, -0.05, -90]),
+            high=np.array([0.65, 0, 90]),  # seed=seed
         )
 
         self.box6_space = Box(
-            low=np.array([0.55, 0.05, -90]), high=np.array([0.65, 0.1, 90])  # , seed=seed
+            low=np.array([0.55, 0.05, -90]),
+            high=np.array([0.65, 0.1, 90]),  # seed=seed
         )
 
         self.index = index
         self.num_boxes = num_boxes
 
     def start(self, random=True, context=None):
-
         if random:
             self.context = self.sample()
         else:
@@ -86,7 +92,6 @@ class BlockContextManager:
         self.set_context(self.context)
 
     def sample(self):
-
         pos_1 = self.box1_space.sample()
         angle_1 = [0, 0, pos_1[-1] * np.pi / 180]
         quat_1 = euler2quat(angle_1)
@@ -111,15 +116,20 @@ class BlockContextManager:
         angle_6 = [0, 0, pos_6[-1] * np.pi / 180]
         quat_6 = euler2quat(angle_6)
 
-        contexts = [[pos_1, quat_1], [pos_2, quat_2], [pos_3, quat_3],
-                    [pos_4, quat_4], [pos_5, quat_5], [pos_6, quat_6]]
+        contexts = [
+            [pos_1, quat_1],
+            [pos_2, quat_2],
+            [pos_3, quat_3],
+            [pos_4, quat_4],
+            [pos_5, quat_5],
+            [pos_6, quat_6],
+        ]
 
         random.shuffle(contexts)
 
         return contexts
 
     def set_context(self, context):
-
         if self.num_boxes == 2:
             box_range = [0, 1]
 
@@ -200,9 +210,8 @@ class SortingEnv(GymEnvWrapper):
         interactive: bool = False,
         render: bool = True,
         num_boxes: int = 2,
-        if_vision: bool = False
+        if_vision: bool = False,
     ):
-
         sim_factory = MjFactory()
         render_mode = Scene.RenderMode.HUMAN if render else Scene.RenderMode.BLIND
 
@@ -237,9 +246,7 @@ class SortingEnv(GymEnvWrapper):
         self.action_space = Box(
             low=np.array([-0.01, -0.01]), high=np.array([0.01, 0.01])
         )
-        self.observation_space = Box(
-            low=-np.inf, high=np.inf, shape=(8, )
-        )
+        self.observation_space = Box(low=-np.inf, high=np.inf, shape=(8,))
 
         self.interactive = interactive
 
@@ -287,7 +294,7 @@ class SortingEnv(GymEnvWrapper):
 
         self.cam_dict = {
             "bp-cam": CamLogger(scene, self.bp_cam),
-            "inhand-cam": CamLogger(scene, self.inhand_cam)
+            "inhand-cam": CamLogger(scene, self.inhand_cam),
         }
 
         for _, v in self.log_dict.items():
@@ -306,7 +313,6 @@ class SortingEnv(GymEnvWrapper):
         self.min_inds = []
 
     def get_observation(self) -> np.ndarray:
-
         robot_pos = self.robot_state()[:2]
 
         if self.if_vision:
@@ -320,22 +326,34 @@ class SortingEnv(GymEnvWrapper):
             return robot_pos, bp_image, inhand_image
 
         red_box_1_pos = self.scene.get_obj_pos(self.red_box_1)[:2]
-        red_box_1_quat = np.tan(quat2euler(self.scene.get_obj_quat(self.red_box_1))[-1:])
+        red_box_1_quat = np.tan(
+            quat2euler(self.scene.get_obj_quat(self.red_box_1))[-1:]
+        )
 
         red_box_2_pos = self.scene.get_obj_pos(self.red_box_2)[:2]
-        red_box_2_quat = np.tan(quat2euler(self.scene.get_obj_quat(self.red_box_2))[-1:])
+        red_box_2_quat = np.tan(
+            quat2euler(self.scene.get_obj_quat(self.red_box_2))[-1:]
+        )
 
         red_box_3_pos = self.scene.get_obj_pos(self.red_box_3)[:2]
-        red_box_3_quat = np.tan(quat2euler(self.scene.get_obj_quat(self.red_box_3))[-1:])
+        red_box_3_quat = np.tan(
+            quat2euler(self.scene.get_obj_quat(self.red_box_3))[-1:]
+        )
 
         blue_box_1_pos = self.scene.get_obj_pos(self.blue_box_1)[:2]
-        blue_box_1_quat = np.tan(quat2euler(self.scene.get_obj_quat(self.blue_box_1))[-1:])
+        blue_box_1_quat = np.tan(
+            quat2euler(self.scene.get_obj_quat(self.blue_box_1))[-1:]
+        )
 
         blue_box_2_pos = self.scene.get_obj_pos(self.blue_box_2)[:2]
-        blue_box_2_quat = np.tan(quat2euler(self.scene.get_obj_quat(self.blue_box_2))[-1:])
+        blue_box_2_quat = np.tan(
+            quat2euler(self.scene.get_obj_quat(self.blue_box_2))[-1:]
+        )
 
         blue_box_3_pos = self.scene.get_obj_pos(self.blue_box_3)[:2]
-        blue_box_3_quat = np.tan(quat2euler(self.scene.get_obj_quat(self.blue_box_3))[-1:])
+        blue_box_3_quat = np.tan(
+            quat2euler(self.scene.get_obj_quat(self.blue_box_3))[-1:]
+        )
 
         if self.num_boxes == 2:
 
@@ -380,7 +398,7 @@ class SortingEnv(GymEnvWrapper):
                     blue_box_2_pos,
                     blue_box_2_quat,
                     blue_box_3_pos,
-                    blue_box_3_quat
+                    blue_box_3_quat,
                 ]
             )
 
@@ -394,24 +412,13 @@ class SortingEnv(GymEnvWrapper):
 
         # reset view of the camera
         if self.scene.viewer is not None:
-            # self.scene.viewer.cam.elevation = -55
-            # self.scene.viewer.cam.distance = 1.7
-            # self.scene.viewer.cam.lookat[0] += -0.1
-            # self.scene.viewer.cam.lookat[2] -= 0.2
-
             self.scene.viewer.cam.elevation = -55
             self.scene.viewer.cam.distance = 2.0
             self.scene.viewer.cam.lookat[0] += -0.01
             self.scene.viewer.cam.lookat[2] -= 0.2
 
-            # self.scene.viewer.cam.elevation = -60
-            # self.scene.viewer.cam.distance = 1.6
-            # self.scene.viewer.cam.lookat[0] += 0.05
-            # self.scene.viewer.cam.lookat[2] -= 0.1
-
         # reset the initial state of the robot
         initial_cart_position = copy.deepcopy(init_end_eff_pos)
-        # initial_cart_position[2] = 0.12
         self.robot.gotoCartPosQuatController.setDesiredPos(
             [
                 initial_cart_position[0],
@@ -434,15 +441,18 @@ class SortingEnv(GymEnvWrapper):
         self.robot.beam_to_joint_pos(
             self.robot.gotoCartPosQuatController.trajectory[-1]
         )
-        # self.robot.gotoJointPosition(self.robot.init_qpos, duration=0.05)
-        # self.robot.wait(duration=2.0)
 
         self.robot.gotoCartPositionAndQuat(
-            desiredPos=initial_cart_position, desiredQuat=[0, 1, 0, 0], duration=0.5, log=False
+            desiredPos=initial_cart_position,
+            desiredQuat=[0, 1, 0, 0],
+            duration=0.5,
+            log=False,
         )
 
     def step(self, action, gripper_width=None, desired_vel=None, desired_acc=None):
-        observation, reward, done, _ = super().step(action, gripper_width, desired_vel=desired_vel, desired_acc=desired_acc)
+        observation, reward, terminated, truncated, _ = super().step(
+            action, gripper_width, desired_vel=desired_vel, desired_acc=desired_acc
+        )
         self.success = self._check_early_termination()
         mode, min_inds = self.check_mode()
 
@@ -455,11 +465,16 @@ class SortingEnv(GymEnvWrapper):
 
         mode = self.decode_mode(mode)
 
-        return observation, reward, done, {'mode': mode, 'success':  self.success, 'min_inds': min_inds}
+        return (
+            observation,
+            reward,
+            terminated,
+            truncated,
+            {"mode": mode, "success": self.success, "min_inds": min_inds},
+        )
 
     def decode_mode(self, mode):
-
-       return int(np.packbits(mode)[0])
+        return int(np.packbits(mode)[0])
 
     def check_mode(self):
 
@@ -474,10 +489,23 @@ class SortingEnv(GymEnvWrapper):
         blue_box_2_pos = self.scene.get_obj_pos(self.blue_box_2)[:2]
         blue_box_3_pos = self.scene.get_obj_pos(self.blue_box_3)[:2]
 
-        box_pos = np.vstack((red_box_1_pos, red_box_2_pos, red_box_3_pos, blue_box_1_pos, blue_box_2_pos, blue_box_3_pos))
+        box_pos = np.vstack(
+            (
+                red_box_1_pos,
+                red_box_2_pos,
+                red_box_3_pos,
+                blue_box_1_pos,
+                blue_box_2_pos,
+                blue_box_3_pos,
+            )
+        )
 
-        red_dist = np.linalg.norm(box_pos[:3] - np.reshape(self.red_target_pos, (1, -1)), axis=-1)
-        blue_dist = np.linalg.norm(box_pos[3:] - np.reshape(self.blue_target_pos, (1, -1)), axis=-1)
+        red_dist = np.linalg.norm(
+            box_pos[:3] - np.reshape(self.red_target_pos, (1, -1)), axis=-1
+        )
+        blue_dist = np.linalg.norm(
+            box_pos[3:] - np.reshape(self.blue_target_pos, (1, -1)), axis=-1
+        )
 
         dists = np.concatenate((red_dist, blue_dist))
         dists[self.min_inds] = 100000
@@ -487,7 +515,12 @@ class SortingEnv(GymEnvWrapper):
 
         if min_ind < 3:
             # manipulate red box, 0
-            if_finish = min_box_pos[0] > 0.3 and min_box_pos[0] < 0.5 and min_box_pos[1] > 0.22 and min_box_pos[1] < 0.41
+            if_finish = (
+                min_box_pos[0] > 0.3
+                and min_box_pos[0] < 0.5
+                and min_box_pos[1] > 0.22
+                and min_box_pos[1] < 0.41
+            )
 
             if if_finish:
                 self.mode[self.mode_step] = 0
@@ -496,7 +529,12 @@ class SortingEnv(GymEnvWrapper):
                 self.min_inds.append(min_ind)
         else:
             # manipulate blue box
-            if_finish = min_box_pos[0] > 0.525 and min_box_pos[0] < 0.725 and min_box_pos[1] > 0.22 and min_box_pos[1] < 0.41
+            if_finish = (
+                min_box_pos[0] > 0.525
+                and min_box_pos[0] < 0.725
+                and min_box_pos[1] > 0.22
+                and min_box_pos[1] < 0.41
+            )
 
             if if_finish:
                 self.mode[self.mode_step] = 1
@@ -507,11 +545,9 @@ class SortingEnv(GymEnvWrapper):
         return self.mode, self.min_inds
 
     def get_reward(self, if_sparse=False):
-
         return 0
 
     def _check_early_termination(self) -> bool:
-
         red_box_1_pos = self.scene.get_obj_pos(self.red_box_1)[:2]
         red_box_2_pos = self.scene.get_obj_pos(self.red_box_2)[:2]
         red_box_3_pos = self.scene.get_obj_pos(self.red_box_3)[:2]
@@ -532,8 +568,18 @@ class SortingEnv(GymEnvWrapper):
         else:
             assert False, "no such num boxes"
 
-        red_finished = (red[:, 0] > 0.3).all() and (red[:, 0] < 0.5).all() and (red[:, 1] > 0.22).all() and (red[:, 1] < 0.41).all()
-        blue_finished = (blue[:, 0] > 0.525).all() and (blue[:, 0] < 0.725).all() and (blue[:, 1] > 0.22).all() and (blue[:, 1] < 0.41).all()
+        red_finished = (
+            (red[:, 0] > 0.3).all()
+            and (red[:, 0] < 0.5).all()
+            and (red[:, 1] > 0.22).all()
+            and (red[:, 1] < 0.41).all()
+        )
+        blue_finished = (
+            (blue[:, 0] > 0.525).all()
+            and (blue[:, 0] < 0.725).all()
+            and (blue[:, 1] > 0.22).all()
+            and (blue[:, 1] < 0.41).all()
+        )
 
         if red_finished and blue_finished:
             # terminate if end effector is close enough
@@ -554,10 +600,9 @@ class SortingEnv(GymEnvWrapper):
         self.bp_mode = None
         obs = self._reset_env(random=random, context=context, if_vision=if_vision)
 
-        return obs
+        return obs, {}
 
     def _reset_env(self, random=True, context=None, if_vision=False):
-
         if self.interactive:
             for log_name, s in self.cam_dict.items():
                 s.reset()

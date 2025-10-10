@@ -1,14 +1,14 @@
-import numpy as np
 import copy
+
+import numpy as np
+from d3il_lite.d3il_sim.core import Scene
+from d3il_lite.d3il_sim.core.Logger import CamLogger, ObjectLogger
+from d3il_lite.d3il_sim.gyms.gym_env_wrapper import GymEnvWrapper
+from d3il_lite.d3il_sim.sims import MjCamera
+from d3il_lite.d3il_sim.sims.mj_beta.MjFactory import MjFactory
+from d3il_lite.d3il_sim.sims.mj_beta.MjRobot import MjRobot
 from d3il_lite.d3il_sim.sims.mj_beta.mj_utils.mj_helper import has_collision
 from d3il_lite.d3il_sim.utils.sim_path import d3il_path
-
-from d3il_lite.d3il_sim.core import Scene
-from d3il_lite.d3il_sim.gyms.gym_env_wrapper import GymEnvWrapper
-from d3il_lite.d3il_sim.core.Logger import ObjectLogger, CamLogger
-from d3il_lite.d3il_sim.sims.mj_beta.MjRobot import MjRobot
-from d3il_lite.d3il_sim.sims.mj_beta.MjFactory import MjFactory
-from d3il_lite.d3il_sim.sims import MjCamera
 
 from .avoiding_objects import get_obj_list, init_end_eff_pos, get_obj_xy_list
 
@@ -37,7 +37,6 @@ class BPCageCam(MjCamera):
         )
 
 
-
 class ObstacleAvoidanceManager:
     def __init__(self):
         self.index = 0
@@ -49,21 +48,19 @@ class ObstacleAvoidanceManager:
 
 class AvoidingEnv(GymEnvWrapper):
     def __init__(
-            self,
-            n_substeps: int = 35,
-            max_steps_per_episode: int = 250,
-            debug: bool = False,
-            render: bool = False
+        self,
+        n_substeps: int = 35,
+        max_steps_per_episode: int = 250,
+        debug: bool = False,
+        render: bool = False,
     ):
-
         sim_factory = MjFactory()
         render_mode = Scene.RenderMode.HUMAN if render else Scene.RenderMode.BLIND
         scene = sim_factory.create_scene(
             object_list=obj_list, render=render_mode, dt=0.001
         )
         robot = MjRobot(
-            scene,
-            xml_path=d3il_path("./models/mj/robot/panda_rod_invisible.xml")
+            scene, xml_path=d3il_path("./models/mj/robot/panda_rod_invisible.xml")
         )
         controller = robot.cartesianPosQuatTrackingController
 
@@ -125,21 +122,11 @@ class AvoidingEnv(GymEnvWrapper):
             self.scene.viewer.cam.distance = 1.8
             self.scene.viewer.cam.lookat[0] += -0.1
             self.scene.viewer.cam.lookat[2] -= 0.2
-
-            # self.scene.viewer.cam.elevation = -55
-            # self.scene.viewer.cam.distance = 2.0
-            # self.scene.viewer.cam.lookat[0] += 0
-            # self.scene.viewer.cam.lookat[2] -= 0.2
-            # self.scene.viewer.cam.elevation = -60
-            # self.scene.viewer.cam.distance = 1.6
-            # self.scene.viewer.cam.lookat[0] += 0.1
-            # self.scene.viewer.cam.lookat[2] -= 0.1
-        except:
+        except Exception:
             pass
 
         # reset the initial state of the robot
         initial_cart_position = copy.deepcopy(init_end_eff_pos)
-        # initial_cart_position[2] = 0.12
         self.robot.gotoCartPosQuatController.setDesiredPos(
             [
                 initial_cart_position[0],
@@ -152,21 +139,34 @@ class AvoidingEnv(GymEnvWrapper):
             ]
         )
         self.robot.gotoCartPosQuatController.initController(self.robot, 1)
-
-        self.robot.init_qpos = self.robot.gotoCartPosQuatController.trajectory[-1].copy()
+        self.robot.init_qpos = self.robot.gotoCartPosQuatController.trajectory[
+            -1
+        ].copy()
         self.robot.init_tcp_pos = initial_cart_position
         self.robot.init_tcp_quat = [0, 1, 0, 0]
-
-        self.robot.beam_to_joint_pos(self.robot.gotoCartPosQuatController.trajectory[-1])
-
+        self.robot.beam_to_joint_pos(
+            self.robot.gotoCartPosQuatController.trajectory[-1]
+        )
         self.robot.gotoCartPositionAndQuat(
             desiredPos=initial_cart_position, desiredQuat=[0, 1, 0, 0], duration=0.5
         )
 
     def step(self, action, gripper_width=None):
-        observation, reward, done, _ = super().step(action, gripper_width)
+        robot_pos = self.robot_state()
+        action = np.concatenate(
+            [robot_pos[:2] + action, robot_pos[2], [0, 1, 0, 0]], axis=0
+        )
+        observation, reward, terminated, truncated, _ = super().step(
+            action, gripper_width
+        )
         self.check_mode()
-        return observation, reward, done, (self.mode_encoding, self.success)
+        return (
+            observation,
+            reward,
+            terminated,
+            truncated,
+            (self.mode_encoding, self.success),
+        )
 
     def check_mode(self):
         r_x_pos = self.robot.current_c_pos[0]
@@ -200,17 +200,17 @@ class AvoidingEnv(GymEnvWrapper):
             self.l3_passed = True
 
     def check_failure(self):
-        if has_collision('l1_obs', 'rod', self.scene.model, self.scene.data):
+        if has_collision("l1_obs", "rod", self.scene.model, self.scene.data):
             return True
-        elif has_collision('l2_top_obs', 'rod', self.scene.model, self.scene.data):
+        elif has_collision("l2_top_obs", "rod", self.scene.model, self.scene.data):
             return True
-        elif has_collision('l2_bottom_obs', 'rod', self.scene.model, self.scene.data):
+        elif has_collision("l2_bottom_obs", "rod", self.scene.model, self.scene.data):
             return True
-        elif has_collision('l3_top_obs', 'rod', self.scene.model, self.scene.data):
+        elif has_collision("l3_top_obs", "rod", self.scene.model, self.scene.data):
             return True
-        elif has_collision('l3_mid_obs', 'rod', self.scene.model, self.scene.data):
+        elif has_collision("l3_mid_obs", "rod", self.scene.model, self.scene.data):
             return True
-        elif has_collision('l3_bottom_obs', 'rod', self.scene.model, self.scene.data):
+        elif has_collision("l3_bottom_obs", "rod", self.scene.model, self.scene.data):
             return True
         else:
             return False
@@ -228,13 +228,9 @@ class AvoidingEnv(GymEnvWrapper):
         assert np.sum(self.mode_encoding) <= 3
         self.mode_encoding = np.zeros(2 + 3 + 4)
 
-    def get_reward(self):
-        ...
+    def get_reward(self): ...
 
     def _check_early_termination(self) -> bool:
-
-        # print(self.check_failure())
-
         if self.check_success() or self.check_failure():
             if self.check_success():
                 self.success = True
@@ -250,7 +246,7 @@ class AvoidingEnv(GymEnvWrapper):
         self.reset_mode_encoding()
         self.success = False
         obs = self._reset_env(random=random, context=context)
-        return obs
+        return obs, {}
 
     def _reset_env(self, random=True, context=None):
         self.scene.reset()
@@ -261,7 +257,9 @@ class AvoidingEnv(GymEnvWrapper):
 
     def reward(self, x):
         def squared_exp_kernel(x, mean, scale, bandwidth):
-            return scale * np.exp(np.square(np.linalg.norm(x - mean, axis=1)) / bandwidth)
+            return scale * np.exp(
+                np.square(np.linalg.norm(x - mean, axis=1)) / bandwidth
+            )
 
         rewards = np.zeros(x.shape[0])
         for obs in self.obj_xy_list:
@@ -274,9 +272,7 @@ class AvoidingEnv(GymEnvWrapper):
         data_decimal = data.dot(1 << np.arange(data.shape[-1]))
         _, counts = np.unique(data_decimal, return_counts=True)
         mode_dist = counts / np.sum(counts)
-        entropy = - np.sum(mode_dist * (np.log(mode_dist) / np.log(24)))
+        entropy = -np.sum(mode_dist * (np.log(mode_dist) / np.log(24)))
         return counts, entropy
 
-
-    def action_space(self):
-        ...
+    def action_space(self): ...

@@ -1,4 +1,3 @@
-
 import copy
 
 import cv2
@@ -13,7 +12,9 @@ from d3il_lite.d3il_sim.sims import MjCamera
 from d3il_lite.d3il_sim.sims.mj_beta.MjFactory import MjFactory
 from d3il_lite.d3il_sim.sims.mj_beta.MjRobot import MjRobot
 from d3il_lite.d3il_sim.utils.geometric_transformation import (
-    euler2quat, quat2euler)
+    euler2quat,
+    quat2euler,
+)
 from d3il_lite.d3il_sim.utils.sim_path import d3il_path
 
 from .stacking_objects import get_obj_list, init_end_eff_pos
@@ -50,25 +51,28 @@ class BlockContextManager:
         np.random.seed(seed)
 
         self.red_space = Box(
-            low=np.array([0.35, -0.25, -90]), high=np.array([0.45, -0.15, 90])  # , seed=seed
+            low=np.array([0.35, -0.25, -90]),
+            high=np.array([0.45, -0.15, 90]),  # seed=seed
         )
 
         self.green_space = Box(
-            low=np.array([0.35, -0.1, -90]), high=np.array([0.45, 0, 90])  # , seed=seed
+            low=np.array([0.35, -0.1, -90]),
+            high=np.array([0.45, 0, 90]),  # seed=seed
         )
 
         self.blue_space = Box(
-            low=np.array([0.55, -0.2, -90]), high=np.array([0.6, 0, 90])  # , seed=seed
+            low=np.array([0.55, -0.2, -90]),
+            high=np.array([0.6, 0, 90]),  # seed=seed
         )
 
         self.target_space = Box(
-            low=np.array([0.4, 0.15, -90]), high=np.array([0.6, 0.25, 90])  # , seed=seed
+            low=np.array([0.4, 0.15, -90]),
+            high=np.array([0.6, 0.25, 90]),  # seed=seed
         )
 
         self.index = index
 
     def start(self, random=True, context=None):
-
         if random:
             self.context = self.sample()
         else:
@@ -77,7 +81,6 @@ class BlockContextManager:
         self.set_context(self.context)
 
     def sample(self):
-
         pos_1 = self.red_space.sample()
         angle_1 = [0, 0, pos_1[-1] * np.pi / 180]
         quat_1 = euler2quat(angle_1)
@@ -97,7 +100,6 @@ class BlockContextManager:
         return [pos_1, quat_1], [pos_2, quat_2], [pos_3, quat_3], [pos_4, quat_4]
 
     def set_context(self, context):
-
         red_pos = context[0][0]
         red_quat = context[0][1]
 
@@ -141,7 +143,7 @@ class StackingEnv(GymEnvWrapper):
         random_env: bool = False,
         interactive: bool = False,
         render: bool = True,
-        if_vision: bool = False
+        if_vision: bool = False,
     ):
 
         sim_factory = MjFactory()
@@ -168,9 +170,7 @@ class StackingEnv(GymEnvWrapper):
         self.action_space = Box(
             low=np.array([-0.01, -0.01]), high=np.array([0.01, 0.01])
         )
-        self.observation_space = Box(
-            low=-np.inf, high=np.inf, shape=(8, )
-        )
+        self.observation_space = Box(low=-np.inf, high=np.inf, shape=(8,))
 
         self.interactive = interactive
 
@@ -196,7 +196,7 @@ class StackingEnv(GymEnvWrapper):
 
         self.cam_dict = {
             "bp-cam": CamLogger(scene, self.bp_cam),
-            "inhand-cam": CamLogger(scene, self.inhand_cam)
+            "inhand-cam": CamLogger(scene, self.inhand_cam),
         }
 
         for _, v in self.log_dict.items():
@@ -223,10 +223,8 @@ class StackingEnv(GymEnvWrapper):
         tcp_quad = self.robot.current_c_quat
 
         return np.concatenate((joint_pos, gripper_width)), joint_pos, tcp_quad
-        # return np.concatenate((tcp_pos, tcp_quad, gripper_width))
 
     def get_observation(self) -> np.ndarray:
-
         j_state, robot_c_pos, robot_c_quat = self.robot_state()
 
         if self.if_vision:
@@ -239,38 +237,28 @@ class StackingEnv(GymEnvWrapper):
 
             return j_state, bp_image, inhand_image
 
-        # robot_state = self.robot_state()
-
         red_box_pos = self.scene.get_obj_pos(self.red_box)
         red_box_quat = np.tan(quat2euler(self.scene.get_obj_quat(self.red_box))[-1:])
-        # red_box_quat = np.concatenate((np.sin(red_box_quat), np.cos(red_box_quat)))
 
         green_box_pos = self.scene.get_obj_pos(self.green_box)
-        green_box_quat = np.tan(quat2euler(self.scene.get_obj_quat(self.green_box))[-1:])
-        # green_box_quat = np.concatenate((np.sin(green_box_quat), np.cos(green_box_quat)))
+        green_box_quat = np.tan(
+            quat2euler(self.scene.get_obj_quat(self.green_box))[-1:]
+        )
 
         blue_box_pos = self.scene.get_obj_pos(self.blue_box)
         blue_box_quat = np.tan(quat2euler(self.scene.get_obj_quat(self.blue_box))[-1:])
-        # blue_box_quat = np.concatenate((np.sin(blue_box_quat), np.cos(blue_box_quat)))
 
-        target_pos = self.scene.get_obj_pos(self.target_box) #- robot_c_pos
+        target_pos = self.scene.get_obj_pos(self.target_box)  # - robot_c_pos
         target_quat = self.scene.get_obj_quat(self.target_box)
 
         env_state = np.concatenate(
             [
-                # robot_state[:-1],
-                # quat2euler(robot_c_quat),
-                # joint_state[:-1],
-                # gripper_width,
-                # robot_c_pos,
-                # robot_c_quat,
                 red_box_pos,
                 red_box_quat,
                 green_box_pos,
                 green_box_quat,
                 blue_box_pos,
                 blue_box_quat,
-                # target_pos,
             ]
         )
 
@@ -281,24 +269,13 @@ class StackingEnv(GymEnvWrapper):
 
         # reset view of the camera
         if self.scene.viewer is not None:
-            # self.scene.viewer.cam.elevation = -55
-            # self.scene.viewer.cam.distance = 1.7
-            # self.scene.viewer.cam.lookat[0] += -0.1
-            # self.scene.viewer.cam.lookat[2] -= 0.2
-
             self.scene.viewer.cam.elevation = -55
             self.scene.viewer.cam.distance = 2.0
             self.scene.viewer.cam.lookat[0] += 0
             self.scene.viewer.cam.lookat[2] -= 0.2
 
-            # self.scene.viewer.cam.elevation = -60
-            # self.scene.viewer.cam.distance = 1.6
-            # self.scene.viewer.cam.lookat[0] += 0.05
-            # self.scene.viewer.cam.lookat[2] -= 0.1
-
         # reset the initial state of the robot
         initial_cart_position = copy.deepcopy(init_end_eff_pos)
-        # initial_cart_position[2] = 0.12
         self.robot.gotoCartPosQuatController.setDesiredPos(
             [
                 initial_cart_position[0],
@@ -321,55 +298,32 @@ class StackingEnv(GymEnvWrapper):
         self.robot.beam_to_joint_pos(
             self.robot.gotoCartPosQuatController.trajectory[-1]
         )
-        # self.robot.gotoJointPosition(self.robot.init_qpos, duration=0.05)
-        # self.robot.wait(duration=2.0)
 
         self.robot.gotoCartPositionAndQuat(
-            desiredPos=initial_cart_position, desiredQuat=[0, 1, 0, 0], duration=0.5, log=False
+            desiredPos=initial_cart_position,
+            desiredQuat=[0, 1, 0, 0],
+            duration=0.5,
+            log=False,
         )
 
     def step(self, action, gripper_width=None, desired_vel=None, desired_acc=None):
-
         j_pos = action[:7]
-        # j_vel = action[7:14]
         gripper_width = action[-1]
 
         if gripper_width > 0.075:
-
             self.robot.open_fingers()
-
-            # if self.gripper_flag == 0:
-            #     print(0)
-            #     self.robot.open_fingers()
-            #     self.gripper_flag = 1
         else:
             self.robot.close_fingers(duration=0.0)
-            # if self.gripper_flag == 1:
-            #
-            #     print(1)
-            #     self.robot.close_fingers(duration=0.5)
-            #     print(self.robot.set_gripper_width)
-            #
-            #     self.gripper_flag = 0
 
-        # self.robot.set_gripper_width = gripper_width
-
-        # c_pos, c_quat = self.robot.getForwardKinematics(action)
-        # c_action = np.concatenate((c_pos, c_quat))
-
-        # c_pos = action[:3]
-        # c_quat = euler2quat(action[3:6])
-        # c_action = np.concatenate((c_pos, c_quat))
-
-        self.controller.setSetPoint(action[:-1])#, desired_vel=desired_vel, desired_acc=desired_acc)
-        # self.controller.setSetPoint(action)#, desired_vel=j_vel, desired_acc=desired_acc)
+        self.controller.setSetPoint(action[:-1])
         self.controller.executeControllerTimeSteps(
             self.robot, self.n_substeps, block=False
         )
 
         observation = self.get_observation()
         reward = self.get_reward()
-        done = self.is_finished()
+        terminated = self.is_finished()
+        truncated = False
 
         for i in range(self.n_substeps):
             self.scene.next_step()
@@ -383,18 +337,25 @@ class StackingEnv(GymEnvWrapper):
         self.success = self._check_early_termination()
         mode_encoding, mean_distance = self.check_mode()
 
-        mode = ''
+        mode = ""
         mode = mode.join(mode_encoding)
 
-        return observation, reward, done, {'mode': mode,
-                                           'success':  self.success,
-                                           'success_1': len(mode) > 0,
-                                           'success_2': len(mode) > 1,
-                                           'mean_distance': mean_distance}
+        return (
+            observation,
+            reward,
+            terminated,
+            truncated,
+            {
+                "mode": mode,
+                "success": self.success,
+                "success_1": len(mode) > 0,
+                "success_2": len(mode) > 1,
+                "mean_distance": mean_distance,
+            },
+        )
 
     def check_mode(self):
-
-        modes = ['r', 'g', 'b']
+        modes = ["r", "g", "b"]
 
         red_pos = self.scene.get_obj_pos(self.red_box)[:2]
         green_pos = self.scene.get_obj_pos(self.green_box)[:2]
@@ -419,18 +380,20 @@ class StackingEnv(GymEnvWrapper):
         return self.mode_encoding, mean_dists
 
     def get_reward(self, if_sparse=False):
-
         return 0
 
     def _check_early_termination(self) -> bool:
-
         red_pos = self.scene.get_obj_pos(self.red_box)
         green_pos = self.scene.get_obj_pos(self.green_box)
         blue_pos = self.scene.get_obj_pos(self.blue_box)
 
-        diff_z = min([np.linalg.norm(red_pos[-1]-green_pos[-1]),
-                      np.linalg.norm(red_pos[-1] - blue_pos[-1]),
-                      np.linalg.norm(green_pos[-1] - blue_pos[-1])])
+        diff_z = min(
+            [
+                np.linalg.norm(red_pos[-1] - green_pos[-1]),
+                np.linalg.norm(red_pos[-1] - blue_pos[-1]),
+                np.linalg.norm(green_pos[-1] - blue_pos[-1]),
+            ]
+        )
 
         target_pos = self.scene.get_obj_pos(self.target_box)[:2]
 
@@ -438,8 +401,12 @@ class StackingEnv(GymEnvWrapper):
         dis_gt, _ = obj_distance(green_pos[:2], target_pos)
         dis_bt, _ = obj_distance(blue_pos[:2], target_pos)
 
-        if (dis_rt <= self.pos_min_dist) and (dis_gt <= self.pos_min_dist) \
-                and (dis_bt <= self.pos_min_dist) and (diff_z > 0.03):
+        if (
+            (dis_rt <= self.pos_min_dist)
+            and (dis_gt <= self.pos_min_dist)
+            and (dis_bt <= self.pos_min_dist)
+            and (diff_z > 0.03)
+        ):
             # terminate if end effector is close enough
             self.terminated = True
             return True
@@ -457,10 +424,9 @@ class StackingEnv(GymEnvWrapper):
         self.bp_mode = None
         obs = self._reset_env(random=random, context=context)
 
-        return obs
+        return obs, {}
 
     def _reset_env(self, random=True, context=None):
-
         if self.interactive:
             for log_name, s in self.cam_dict.items():
                 s.reset()

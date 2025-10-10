@@ -1,32 +1,43 @@
-import numpy as np
 import copy
+import sys
 import time
 
-import sys
-
+import numpy as np
 from gymnasium.spaces import Box
 
-from d3il_lite.d3il_sim.utils.sim_path import d3il_path
 from d3il_lite.d3il_sim.controllers.Controller import ControllerBase
 from d3il_lite.d3il_sim.core import Scene
-from d3il_lite.d3il_sim.core.Logger import ObjectLogger, CamLogger
+from d3il_lite.d3il_sim.core.Logger import CamLogger, ObjectLogger
+from d3il_lite.d3il_sim.gyms.gym_controllers import GymCartesianVelController
 from d3il_lite.d3il_sim.gyms.gym_env_wrapper import GymEnvWrapper
 from d3il_lite.d3il_sim.gyms.gym_utils.helpers import obj_distance
-from d3il_lite.d3il_sim.utils.geometric_transformation import euler2quat, quat2euler
-
-from d3il_lite.d3il_sim.sims.mj_beta.MjRobot import MjRobot
-from d3il_lite.d3il_sim.sims.mj_beta.MjFactory import MjFactory
 from d3il_lite.d3il_sim.sims import MjCamera
-
-from d3il_lite.d3il_sim.gyms.gym_controllers import GymCartesianVelController
+from d3il_lite.d3il_sim.sims.mj_beta.MjFactory import MjFactory
+from d3il_lite.d3il_sim.sims.mj_beta.MjRobot import MjRobot
+from d3il_lite.d3il_sim.utils.geometric_transformation import (
+    euler2quat,
+    quat2euler,
+)
+from d3il_lite.d3il_sim.utils.sim_path import d3il_path
 from .gate_insertion_objects import get_obj_list, init_end_eff_pos
 
-obj_list, push_box1, push_box2, push_box3, target_box1, target_box2, target_box3, maze = get_obj_list()
+(
+    obj_list,
+    push_box1,
+    push_box2,
+    push_box3,
+    target_box1,
+    target_box2,
+    target_box3,
+    maze,
+) = get_obj_list()
+
 
 class BPCageCam(MjCamera):
     """
     Cage camera. Extends the camera base class.
     """
+
     def __init__(self, width: int = 512, height: int = 512, *args, **kwargs):
         super().__init__(
             "bp_cam",
@@ -51,15 +62,18 @@ class BlockContextManager:
         np.random.seed(seed)
 
         self.box1_space = Box(
-            low=np.array([0.35, -0.2, -90]), high=np.array([0.5, -0.15, 90])  # , seed=seed
+            low=np.array([0.35, -0.2, -90]),
+            high=np.array([0.5, -0.15, 90]),  # seed=seed
         )
 
         self.box2_space = Box(
-            low=np.array([0.55, -0.1, -90]), high=np.array([0.7, -0.05, 90])  # , seed=seed
+            low=np.array([0.55, -0.1, -90]),
+            high=np.array([0.7, -0.05, 90]),  # seed=seed
         )
 
         self.box3_space = Box(
-            low=np.array([0.35, 0, -90]), high=np.array([0.5, 0.05, 90])  # , seed=seed
+            low=np.array([0.35, 0, -90]),
+            high=np.array([0.5, 0.05, 90]),  # seed=seed
         )
 
         # Reduced context space size
@@ -159,7 +173,7 @@ class InsertingEnv(GymEnvWrapper):
         debug: bool = False,
         random_env: bool = False,
         interactive: bool = False,
-        render: bool = True
+        render: bool = True,
     ):
 
         sim_factory = MjFactory()
@@ -172,8 +186,6 @@ class InsertingEnv(GymEnvWrapper):
             xml_path=d3il_path("./models/mj/robot/panda_rod_invisible.xml"),
         )
         controller = robot.cartesianPosQuatTrackingController
-        # controller = robot.jointTrackingController
-        # controller = GymCartesianVelController(robot, fixed_orientation=[0,1,0,0])
 
         super().__init__(
             scene=scene,
@@ -186,9 +198,7 @@ class InsertingEnv(GymEnvWrapper):
         self.action_space = Box(
             low=np.array([-0.01, -0.01]), high=np.array([0.01, 0.01])
         )
-        self.observation_space = Box(
-            low=-np.inf, high=np.inf, shape=(14, )
-        )
+        self.observation_space = Box(low=-np.inf, high=np.inf, shape=(14,))
 
         self.interactive = interactive
 
@@ -233,8 +243,6 @@ class InsertingEnv(GymEnvWrapper):
             self.target_box1,
             self.target_box2,
             self.target_box3,
-            # self.maze_1,
-            # self.maze_2,
             self.maze_3,
             self.maze_4,
             self.maze_5,
@@ -251,7 +259,7 @@ class InsertingEnv(GymEnvWrapper):
             self.maze_16,
             self.maze_17,
             self.maze_18,
-            self.maze_19
+            self.maze_19,
         ]:
             self.scene.add_object(obj)
 
@@ -268,38 +276,34 @@ class InsertingEnv(GymEnvWrapper):
 
         self.cam_dict = {
             "bp-cam": CamLogger(scene, self.bp_cam),
-            "inhand-cam": CamLogger(scene, self.inhand_cam)
+            "inhand-cam": CamLogger(scene, self.inhand_cam),
         }
 
         for _, v in self.log_dict.items():
             scene.add_logger(v)
-
-        # for _, v in self.cam_dict.items():
-        #     scene.add_logger(v)
 
         self.target_min_dist = 0.01
         self.bp_mode = None
         self.first_visit = -1
 
         self.modes = []
-        self.mode_dict = {'rgb': 1, 'rbg': 2, 'grb': 3, 'gbr': 4, 'brg': 5, 'bgr': 6}
-
+        self.mode_dict = {"rgb": 1, "rbg": 2, "grb": 3, "gbr": 4, "brg": 5, "bgr": 6}
 
     def get_observation(self) -> np.ndarray:
         robot_pos = self.robot_state()[:2]
 
-        box1_pos = self.scene.get_obj_pos(self.push_box1)[:2]  # - robot_pos
+        box1_pos = self.scene.get_obj_pos(self.push_box1)[:2]
         box1_quat = np.tan(quat2euler(self.scene.get_obj_quat(self.push_box1))[-1:])
 
-        box2_pos = self.scene.get_obj_pos(self.push_box2)[:2]  # - robot_pos
+        box2_pos = self.scene.get_obj_pos(self.push_box2)[:2]
         box2_quat = np.tan(quat2euler(self.scene.get_obj_quat(self.push_box2))[-1:])
 
-        box3_pos = self.scene.get_obj_pos(self.push_box3)[:2]  # - robot_pos
+        box3_pos = self.scene.get_obj_pos(self.push_box3)[:2]
         box3_quat = np.tan(quat2euler(self.scene.get_obj_quat(self.push_box3))[-1:])
 
-        target_box1_pos = self.scene.get_obj_pos(self.target_box1)[:2]  # - robot_pos
-        target_box2_pos = self.scene.get_obj_pos(self.target_box2)[:2]  # - robot_pos
-        target_box3_pos = self.scene.get_obj_pos(self.target_box3)[:2]  # - robot_pos
+        target_box1_pos = self.scene.get_obj_pos(self.target_box1)[:2]
+        target_box2_pos = self.scene.get_obj_pos(self.target_box2)[:2]
+        target_box3_pos = self.scene.get_obj_pos(self.target_box3)[:2]
 
         env_state = np.concatenate(
             [
@@ -310,14 +314,10 @@ class InsertingEnv(GymEnvWrapper):
                 box2_quat,
                 box3_pos,
                 box3_quat,
-                # target_box1_pos,
-                # target_box2_pos,
-                # target_box3_pos
             ]
         )
 
         return env_state.astype(np.float32)
-        # return np.concatenate([robot_state, env_state])
 
     def start(self):
         self.scene.start()
@@ -328,11 +328,6 @@ class InsertingEnv(GymEnvWrapper):
             self.scene.viewer.cam.distance = 1.8
             self.scene.viewer.cam.lookat[0] += -0.19
             self.scene.viewer.cam.lookat[2] -= 0.2
-
-            # self.scene.viewer.cam.elevation = -60
-            # self.scene.viewer.cam.distance = 1.6
-            # self.scene.viewer.cam.lookat[0] += 0.05
-            # self.scene.viewer.cam.lookat[2] -= 0.1
 
         # reset the initial state of the robot
         initial_cart_position = copy.deepcopy(init_end_eff_pos)
@@ -359,20 +354,23 @@ class InsertingEnv(GymEnvWrapper):
         self.robot.beam_to_joint_pos(
             self.robot.gotoCartPosQuatController.trajectory[-1]
         )
-        # self.robot.gotoJointPosition(self.robot.init_qpos, duration=0.05)
-        # self.robot.wait(duration=2.0)
 
         self.robot.gotoCartPositionAndQuat(
-            desiredPos=initial_cart_position, desiredQuat=[0, 1, 0, 0], duration=0.5, log=False
+            desiredPos=initial_cart_position,
+            desiredQuat=[0, 1, 0, 0],
+            duration=0.5,
+            log=False,
         )
 
     def step(self, action, gripper_width=None, desired_vel=None, desired_acc=None):
-        observation, reward, done, _ = super().step(action, gripper_width, desired_vel=desired_vel, desired_acc=desired_acc)
+        observation, reward, terminated, truncate, _ = super().step(
+            action, gripper_width, desired_vel=desired_vel, desired_acc=desired_acc
+        )
         self.success = self._check_early_termination()
         mean_distance = self.check_mean_dist()
 
         mode = self.check_mode()
-        mode = ''.join(mode)
+        mode = "".join(mode)
 
         one_box = 0
         two_box = 0
@@ -388,15 +386,22 @@ class InsertingEnv(GymEnvWrapper):
             two_box = 1
             three_box = 1
 
-        return observation, reward, done, {'success':  self.success,
-                                           'mean_distance': mean_distance,
-                                           'mode': self.mode_dict[mode] if len(mode) == 3 else 0,
-                                           'one_box_success': one_box,
-                                           'two_box_success': two_box,
-                                           'three_box_success': three_box}
+        return (
+            observation,
+            reward,
+            terminated,
+            truncated,
+            {
+                "success": self.success,
+                "mean_distance": mean_distance,
+                "mode": self.mode_dict[mode] if len(mode) == 3 else 0,
+                "one_box_success": one_box,
+                "two_box_success": two_box,
+                "three_box_success": three_box,
+            },
+        )
 
     def check_mode(self):
-
         box1_pos = self.scene.get_obj_pos(self.push_box1)
         box2_pos = self.scene.get_obj_pos(self.push_box2)
         box3_pos = self.scene.get_obj_pos(self.push_box3)
@@ -409,14 +414,14 @@ class InsertingEnv(GymEnvWrapper):
         dist_box2_target2, _ = obj_distance(box2_pos, target_box2_pos)
         dist_box3_target3, _ = obj_distance(box3_pos, target_box3_pos)
 
-        if dist_box1_target1 <= self.target_min_dist and 'r' not in self.modes:
-            self.modes.append('r')
+        if dist_box1_target1 <= self.target_min_dist and "r" not in self.modes:
+            self.modes.append("r")
 
-        if dist_box2_target2 <= self.target_min_dist and 'g' not in self.modes:
-            self.modes.append('g')
+        if dist_box2_target2 <= self.target_min_dist and "g" not in self.modes:
+            self.modes.append("g")
 
-        if dist_box3_target3 <= self.target_min_dist and 'b' not in self.modes:
-            self.modes.append('b')
+        if dist_box3_target3 <= self.target_min_dist and "b" not in self.modes:
+            self.modes.append("b")
 
         return self.modes
 
@@ -459,7 +464,9 @@ class InsertingEnv(GymEnvWrapper):
         dist_box2_target2, _ = obj_distance(box2_pos, target_box2_pos)
         dist_box3_target3, _ = obj_distance(box3_pos, target_box3_pos)
 
-        return (-1) * (min_robot_box + dist_box1_target1 + dist_box2_target2 + dist_box3_target3)
+        return (-1) * (
+            min_robot_box + dist_box1_target1 + dist_box2_target2 + dist_box3_target3
+        )
 
     def _check_early_termination(self) -> bool:
         # calculate the distance from end effector to object
@@ -475,8 +482,11 @@ class InsertingEnv(GymEnvWrapper):
         dist_box2_target2, _ = obj_distance(box2_pos, target_box2_pos)
         dist_box3_target3, _ = obj_distance(box3_pos, target_box3_pos)
 
-        if dist_box1_target1 <= self.target_min_dist and dist_box2_target2 <= self.target_min_dist \
-                and dist_box3_target3 <= self.target_min_dist:
+        if (
+            dist_box1_target1 <= self.target_min_dist
+            and dist_box2_target2 <= self.target_min_dist
+            and dist_box3_target3 <= self.target_min_dist
+        ):
             # terminate if end effector is close enough
             self.terminated = True
             return True
@@ -494,10 +504,9 @@ class InsertingEnv(GymEnvWrapper):
         self.bp_mode = None
         obs = self._reset_env(random=random, context=context)
 
-        return obs
+        return obs, {}
 
     def _reset_env(self, random=True, context=None):
-
         if self.interactive:
             for log_name, s in self.cam_dict.items():
                 s.reset()

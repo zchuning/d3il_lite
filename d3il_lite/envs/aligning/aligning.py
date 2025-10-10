@@ -1,18 +1,17 @@
-import cv2
-import numpy as np
 import copy
 
+import cv2
+import numpy as np
 from gymnasium.spaces import Box
 
-from d3il_lite.d3il_sim.utils.sim_path import d3il_path
 from d3il_lite.d3il_sim.core import Scene
-from d3il_lite.d3il_sim.core.Logger import ObjectLogger, CamLogger
+from d3il_lite.d3il_sim.core.Logger import CamLogger, ObjectLogger
 from d3il_lite.d3il_sim.gyms.gym_env_wrapper import GymEnvWrapper
-from d3il_lite.d3il_sim.utils.geometric_transformation import euler2quat
-
-from d3il_lite.d3il_sim.sims.mj_beta.MjRobot import MjRobot
-from d3il_lite.d3il_sim.sims.mj_beta.MjFactory import MjFactory
 from d3il_lite.d3il_sim.sims import MjCamera
+from d3il_lite.d3il_sim.sims.mj_beta.MjFactory import MjFactory
+from d3il_lite.d3il_sim.sims.mj_beta.MjRobot import MjRobot
+from d3il_lite.d3il_sim.utils.geometric_transformation import euler2quat
+from d3il_lite.d3il_sim.utils.sim_path import d3il_path
 
 from .aligning_objects import get_obj_list, init_end_eff_pos
 
@@ -60,11 +59,13 @@ class BlockContextManager:
         np.random.seed(seed)
 
         self.box_space = Box(
-            low=np.array([0.4, -0.25, -90]), high=np.array([0.6, -0.1, 90])#, seed=seed
+            low=np.array([0.4, -0.25, -90]),
+            high=np.array([0.6, -0.1, 90]),  # seed=seed
         )
 
         self.target_space = Box(
-            low=np.array([0.4, 0.2, -90]), high=np.array([0.6, 0.35, 90])#, seed=seed
+            low=np.array([0.4, 0.2, -90]),
+            high=np.array([0.6, 0.35, 90]),  # seed=seed
         )
 
         # index = 0, push from inside
@@ -72,7 +73,6 @@ class BlockContextManager:
         self.index = index
 
     def start(self, random=True, context=None):
-
         if random:
             self.context = self.sample()
         else:
@@ -85,7 +85,6 @@ class BlockContextManager:
         return target_pos, target_quat
 
     def sample(self):
-
         pos = self.box_space.sample()
 
         goal_angle = [0, 0, pos[-1] * np.pi / 180]
@@ -98,7 +97,6 @@ class BlockContextManager:
         return [pos, quat, target_pos, target_quat]
 
     def sample_target_pos(self):
-
         pos = self.target_space.sample()
 
         goal_angle = [0, 0, pos[-1] * np.pi / 180]
@@ -107,7 +105,6 @@ class BlockContextManager:
         return [pos, quat]
 
     def set_context(self, context):
-
         pos, quat, target_pos, target_quat = context
 
         self.scene.set_obj_pos_and_quat(
@@ -135,7 +132,7 @@ class AligningEnv(GymEnvWrapper):
         random_env: bool = False,
         interactive: bool = False,
         render: bool = True,
-        if_vision: bool = False
+        if_vision: bool = False,
     ):
 
         sim_factory = MjFactory()
@@ -162,9 +159,7 @@ class AligningEnv(GymEnvWrapper):
         self.action_space = Box(
             low=np.array([-0.01, -0.01, -0.01]), high=np.array([0.01, 0.01, 0.01])
         )
-        self.observation_space = Box(
-            low=-np.inf, high=np.inf, shape=(17, )
-        )
+        self.observation_space = Box(low=-np.inf, high=np.inf, shape=(17,))
 
         self.interactive = interactive
 
@@ -181,12 +176,12 @@ class AligningEnv(GymEnvWrapper):
 
         self.log_dict = {
             "push-box": ObjectLogger(scene, self.push_box),
-            "target-box": ObjectLogger(scene, self.target_box)
+            "target-box": ObjectLogger(scene, self.target_box),
         }
 
         self.cam_dict = {
             "bp-cam": CamLogger(scene, self.bp_cam),
-            "inhand-cam": CamLogger(scene, self.inhand_cam)
+            "inhand-cam": CamLogger(scene, self.inhand_cam),
         }
 
         for _, v in self.log_dict.items():
@@ -197,17 +192,14 @@ class AligningEnv(GymEnvWrapper):
 
         self.pos_min_dist = 0.018
         self.rot_min_dist = 0.048
-
         self.robot_box_dist = 0.051
 
         self.first_visit = -1
 
     def get_observation(self) -> np.ndarray:
-
         robot_pos = self.robot_state()
 
         if self.if_vision:
-
             bp_image = self.bp_cam.get_image(depth=False)
             bp_image = cv2.cvtColor(bp_image, cv2.COLOR_RGB2BGR)
 
@@ -223,13 +215,7 @@ class AligningEnv(GymEnvWrapper):
         target_quat = self.scene.get_obj_quat(self.target_box)
 
         env_state = np.concatenate(
-            [
-                robot_pos,
-                box_pos,
-                box_quat,
-                target_pos,
-                target_quat
-            ]
+            [robot_pos, box_pos, box_quat, target_pos, target_quat]
         )
 
         return env_state.astype(np.float32)
@@ -267,18 +253,35 @@ class AligningEnv(GymEnvWrapper):
             self.robot.gotoCartPosQuatController.trajectory[-1]
         )
         self.robot.gotoCartPositionAndQuat(
-            desiredPos=initial_cart_position, desiredQuat=[0, 1, 0, 0], duration=0.5, log=False
+            desiredPos=initial_cart_position,
+            desiredQuat=[0, 1, 0, 0],
+            duration=0.5,
+            log=False,
         )
 
     def step(self, action, gripper_width=None, desired_vel=None, desired_acc=None):
         action = np.concatenate([action, [0, 1, 0, 0]], axis=0)
-        observation, reward, terminated, truncated, _ = super().step(action, gripper_width, desired_vel=desired_vel, desired_acc=desired_acc)
+        observation, reward, terminated, truncated, _ = super().step(
+            action,
+            gripper_width,
+            desired_vel=desired_vel,
+            desired_acc=desired_acc,
+        )
         self.success = self._check_early_termination()
         mode, mean_distance = self.check_mode()
-        return observation, reward, terminated, truncated, {'mode': mode, 'success':  self.success, 'mean_distance': mean_distance}
+        return (
+            observation,
+            reward,
+            terminated,
+            truncated,
+            {
+                "mode": mode,
+                "success": self.success,
+                "mean_distance": mean_distance,
+            },
+        )
 
     def check_mode(self):
-
         mode = -1
 
         box_pos = self.scene.get_obj_pos(self.push_box)
@@ -304,7 +307,6 @@ class AligningEnv(GymEnvWrapper):
         return mode, mean_distance
 
     def get_reward(self, if_sparse=False):
-
         box_pos = self.scene.get_obj_pos(self.push_box)
         box_quat = self.scene.get_obj_quat(self.push_box)
 
@@ -317,7 +319,6 @@ class AligningEnv(GymEnvWrapper):
         return box_goal_rot_dist_reward + box_goal_pos_dist_reward
 
     def _check_early_termination(self) -> bool:
-
         box_pos = self.scene.get_obj_pos(self.push_box)
         box_quat = self.scene.get_obj_quat(self.push_box)
 
@@ -348,7 +349,6 @@ class AligningEnv(GymEnvWrapper):
         return obs, {}
 
     def _reset_env(self, random=True, context=None):
-
         if self.interactive:
             for log_name, s in self.cam_dict.items():
                 s.reset()
