@@ -1,8 +1,10 @@
 import copy
 
 import numpy as np
+from gymnasium.spaces import Box
+
 from d3il_lite.d3il_sim.core import Scene
-from d3il_lite.d3il_sim.core.Logger import CamLogger, ObjectLogger
+from d3il_lite.d3il_sim.core.Logger import CamLogger
 from d3il_lite.d3il_sim.gyms.gym_env_wrapper import GymEnvWrapper
 from d3il_lite.d3il_sim.sims import MjCamera
 from d3il_lite.d3il_sim.sims.mj_beta.MjFactory import MjFactory
@@ -71,6 +73,10 @@ class AvoidingEnv(GymEnvWrapper):
             n_substeps=n_substeps,
             debug=debug,
         )
+        self.action_space = Box(
+            low=np.array([-0.01, -0.01]), high=np.array([0.01, 0.01])
+        )
+        self.observation_space = Box(low=-np.inf, high=np.inf, shape=(2,))
 
         self.manager = ObstacleAvoidanceManager()
 
@@ -154,7 +160,7 @@ class AvoidingEnv(GymEnvWrapper):
     def step(self, action, gripper_width=None):
         robot_pos = self.robot_state()
         action = np.concatenate(
-            [robot_pos[:2] + action, robot_pos[2], [0, 1, 0, 0]], axis=0
+            [robot_pos[:2] + action, robot_pos[2:], [0, 1, 0, 0]], axis=0
         )
         observation, reward, terminated, truncated, _ = super().step(
             action, gripper_width
@@ -165,7 +171,10 @@ class AvoidingEnv(GymEnvWrapper):
             reward,
             terminated,
             truncated,
-            (self.mode_encoding, self.success),
+            {
+                "mode": self.mode_encoding,
+                "success": self.success,
+            },
         )
 
     def check_mode(self):
@@ -187,7 +196,6 @@ class AvoidingEnv(GymEnvWrapper):
                 self.mode_encoding[4] = 1
             self.l2_passed = True
 
-        # if r_y_pos - 0.015 <= self.l3_ypos and (not self.l3_passed):
         if r_y_pos >= self.l3_ypos and (not self.l3_passed):
             if r_x_pos < self.l3_top_xpos:
                 self.mode_encoding[5] = 1
@@ -264,7 +272,6 @@ class AvoidingEnv(GymEnvWrapper):
         rewards = np.zeros(x.shape[0])
         for obs in self.obj_xy_list:
             rewards -= squared_exp_kernel(x, np.array(obs), 1, 1)
-        # rewards += np.abs(x[:, 1]- 0.4)
         rewards -= np.abs(x[:, 0] - 0.4)
         return rewards
 
@@ -274,5 +281,3 @@ class AvoidingEnv(GymEnvWrapper):
         mode_dist = counts / np.sum(counts)
         entropy = -np.sum(mode_dist * (np.log(mode_dist) / np.log(24)))
         return counts, entropy
-
-    def action_space(self): ...

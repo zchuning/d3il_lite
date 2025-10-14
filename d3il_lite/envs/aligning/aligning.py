@@ -362,5 +362,4 @@ class AligningEnv(GymEnvWrapper):
         self.scene.next_step(log=False)
 
         observation = self.get_observation()
-
         return observation

@@ -246,7 +246,9 @@ class SortingEnv(GymEnvWrapper):
         self.action_space = Box(
             low=np.array([-0.01, -0.01]), high=np.array([0.01, 0.01])
         )
-        self.observation_space = Box(low=-np.inf, high=np.inf, shape=(8,))
+        self.observation_space = Box(
+            low=-np.inf, high=np.inf, shape=(4 + 3 * self.num_boxes,)
+        )
 
         self.interactive = interactive
 
@@ -356,7 +358,6 @@ class SortingEnv(GymEnvWrapper):
         )
 
         if self.num_boxes == 2:
-
             env_state = np.concatenate(
                 [
                     robot_pos,
@@ -367,7 +368,6 @@ class SortingEnv(GymEnvWrapper):
                 ]
             )
         elif self.num_boxes == 4:
-
             env_state = np.concatenate(
                 [
                     robot_pos,
@@ -381,9 +381,7 @@ class SortingEnv(GymEnvWrapper):
                     blue_box_2_quat,
                 ]
             )
-
         elif self.num_boxes == 6:
-
             env_state = np.concatenate(
                 [
                     robot_pos,
@@ -450,6 +448,10 @@ class SortingEnv(GymEnvWrapper):
         )
 
     def step(self, action, gripper_width=None, desired_vel=None, desired_acc=None):
+        robot_pos = self.robot_state()
+        action = np.concatenate(
+            [robot_pos[:2] + action, robot_pos[2:], [0, 1, 0, 0]], axis=0
+        )
         observation, reward, terminated, truncated, _ = super().step(
             action, gripper_width, desired_vel=desired_vel, desired_acc=desired_acc
         )
@@ -477,7 +479,6 @@ class SortingEnv(GymEnvWrapper):
         return int(np.packbits(mode)[0])
 
     def check_mode(self):
-
         if self.mode_step > 5:
             return self.mode, self.min_inds
 

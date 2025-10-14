@@ -185,7 +185,7 @@ class PushingEnv(GymEnvWrapper):
         self.action_space = Box(
             low=np.array([-0.01, -0.01]), high=np.array([0.01, 0.01])
         )
-        self.observation_space = Box(low=-np.inf, high=np.inf, shape=(14,))
+        self.observation_space = Box(low=-np.inf, high=np.inf, shape=(10,))
 
         self.interactive = interactive
 
@@ -296,6 +296,10 @@ class PushingEnv(GymEnvWrapper):
         )
 
     def step(self, action, gripper_width=None, desired_vel=None, desired_acc=None):
+        robot_pos = self.robot_state()
+        action = np.concatenate(
+            [robot_pos[:2] + action, robot_pos[2:], [0, 1, 0, 0]], axis=0
+        )
         observation, reward, terminated, truncated, _ = super().step(
             action,
             gripper_width,

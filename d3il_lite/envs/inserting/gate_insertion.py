@@ -1,14 +1,10 @@
 import copy
-import sys
-import time
 
 import numpy as np
 from gymnasium.spaces import Box
 
-from d3il_lite.d3il_sim.controllers.Controller import ControllerBase
 from d3il_lite.d3il_sim.core import Scene
 from d3il_lite.d3il_sim.core.Logger import CamLogger, ObjectLogger
-from d3il_lite.d3il_sim.gyms.gym_controllers import GymCartesianVelController
 from d3il_lite.d3il_sim.gyms.gym_env_wrapper import GymEnvWrapper
 from d3il_lite.d3il_sim.gyms.gym_utils.helpers import obj_distance
 from d3il_lite.d3il_sim.sims import MjCamera
@@ -331,7 +327,6 @@ class InsertingEnv(GymEnvWrapper):
 
         # reset the initial state of the robot
         initial_cart_position = copy.deepcopy(init_end_eff_pos)
-        # initial_cart_position[2] = 0.12
         self.robot.gotoCartPosQuatController.setDesiredPos(
             [
                 initial_cart_position[0],
@@ -363,7 +358,11 @@ class InsertingEnv(GymEnvWrapper):
         )
 
     def step(self, action, gripper_width=None, desired_vel=None, desired_acc=None):
-        observation, reward, terminated, truncate, _ = super().step(
+        robot_pos = self.robot_state()
+        action = np.concatenate(
+            [robot_pos[:2] + action, robot_pos[2:], [0, 1, 0, 0]], axis=0
+        )
+        observation, reward, terminated, truncated, _ = super().step(
             action, gripper_width, desired_vel=desired_vel, desired_acc=desired_acc
         )
         self.success = self._check_early_termination()

@@ -167,10 +167,8 @@ class StackingEnv(GymEnvWrapper):
 
         self.if_vision = if_vision
 
-        self.action_space = Box(
-            low=np.array([-0.01, -0.01]), high=np.array([0.01, 0.01])
-        )
-        self.observation_space = Box(low=-np.inf, high=np.inf, shape=(8,))
+        self.action_space = Box(low=-0.01, high=0.01, shape=(8,))  # 7 joint + gripper
+        self.observation_space = Box(low=-np.inf, high=np.inf, shape=(20,))
 
         self.interactive = interactive
 
@@ -327,10 +325,6 @@ class StackingEnv(GymEnvWrapper):
 
         for i in range(self.n_substeps):
             self.scene.next_step()
-
-        debug_info = {}
-        if self.debug:
-            debug_info = self.debug_msg()
 
         self.env_step_counter += 1
 
