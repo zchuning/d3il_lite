@@ -208,7 +208,7 @@ class SortingEnv(GymEnvWrapper):
         debug: bool = False,
         random_env: bool = False,
         interactive: bool = False,
-        render: bool = True,
+        render: bool = False,
         num_boxes: int = 2,
         if_vision: bool = False,
     ):
@@ -247,7 +247,7 @@ class SortingEnv(GymEnvWrapper):
             low=np.array([-0.01, -0.01]), high=np.array([0.01, 0.01])
         )
         self.observation_space = Box(
-            low=-np.inf, high=np.inf, shape=(4 + 3 * self.num_boxes,)
+            low=-np.inf, high=np.inf, shape=(4 + 3 * num_boxes,)
         )
 
         self.interactive = interactive
@@ -589,7 +589,7 @@ class SortingEnv(GymEnvWrapper):
 
         return False
 
-    def reset(self, random=True, context=None, if_vision=False):
+    def reset(self, seed=None, options=None, random=True, context=None, if_vision=False):
         self.terminated = False
         self.env_step_counter = 0
         self.episode += 1

@@ -169,7 +169,7 @@ class InsertingEnv(GymEnvWrapper):
         debug: bool = False,
         random_env: bool = False,
         interactive: bool = False,
-        render: bool = True,
+        render: bool = False,
     ):
 
         sim_factory = MjFactory()

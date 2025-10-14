@@ -131,7 +131,7 @@ class AligningEnv(GymEnvWrapper):
         debug: bool = False,
         random_env: bool = False,
         interactive: bool = False,
-        render: bool = True,
+        render: bool = False,
         if_vision: bool = False,
     ):
 

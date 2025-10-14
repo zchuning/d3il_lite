@@ -31,7 +31,7 @@ register(
     max_episode_steps=2000,
     kwargs={
         "max_steps_per_episode": 100,
-        "render": True,
+        "render": False,
         "num_boxes": 2,
         "if_vision": False,
     },
@@ -41,5 +41,5 @@ register(
     id="stacking-v0",
     entry_point="d3il_lite.envs.stacking:StackingEnv",
     max_episode_steps=2000,
-    kwargs={"max_steps_per_episode": 1000, "render": True, "if_vision": False},
+    kwargs={"max_steps_per_episode": 1000, "render": False, "if_vision": False},
 )
