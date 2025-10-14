@@ -30,3 +30,5 @@ MANIFEST
 # IDE config
 .idea
 .vscode
+
+data/
