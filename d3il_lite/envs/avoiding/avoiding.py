@@ -115,6 +115,9 @@ class AvoidingEnv(GymEnvWrapper):
 
         self.success = False
 
+        # Start simulation
+        self.start()
+
     def get_observation(self) -> np.ndarray:
         robot_c_pos = self.robot_state()[:2]
         return robot_c_pos.astype(np.float32)

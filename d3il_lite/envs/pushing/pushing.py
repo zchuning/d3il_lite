@@ -232,6 +232,9 @@ class PushingEnv(GymEnvWrapper):
         self.bp_mode = None
         self.first_visit = -1
 
+        # Start simulation
+        self.start()
+
     def get_observation(self) -> np.ndarray:
         robot_pos = self.robot_state()[:2]
 

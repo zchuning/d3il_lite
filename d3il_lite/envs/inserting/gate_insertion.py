@@ -285,6 +285,9 @@ class InsertingEnv(GymEnvWrapper):
         self.modes = []
         self.mode_dict = {"rgb": 1, "rbg": 2, "grb": 3, "gbr": 4, "brg": 5, "bgr": 6}
 
+        # Start simulation
+        self.start()
+
     def get_observation(self) -> np.ndarray:
         robot_pos = self.robot_state()[:2]
 

@@ -314,17 +314,15 @@ class SortingEnv(GymEnvWrapper):
         self.mode_step = 0
         self.min_inds = []
 
+        # Start simulation
+        self.start()
+
     def get_observation(self) -> np.ndarray:
         robot_pos = self.robot_state()[:2]
 
         if self.if_vision:
-
             bp_image = self.bp_cam.get_image(depth=False)
-            bp_image = cv2.cvtColor(bp_image, cv2.COLOR_RGB2BGR)
-
             inhand_image = self.inhand_cam.get_image(depth=False)
-            inhand_image = cv2.cvtColor(inhand_image, cv2.COLOR_RGB2BGR)
-
             return robot_pos, bp_image, inhand_image
 
         red_box_1_pos = self.scene.get_obj_pos(self.red_box_1)[:2]

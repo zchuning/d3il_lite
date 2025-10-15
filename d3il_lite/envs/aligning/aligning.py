@@ -196,16 +196,15 @@ class AligningEnv(GymEnvWrapper):
 
         self.first_visit = -1
 
+        # Start simulation
+        self.start()
+
     def get_observation(self) -> np.ndarray:
         robot_pos = self.robot_state()
 
         if self.if_vision:
             bp_image = self.bp_cam.get_image(depth=False)
-            bp_image = cv2.cvtColor(bp_image, cv2.COLOR_RGB2BGR)
-
             inhand_image = self.inhand_cam.get_image(depth=False)
-            inhand_image = cv2.cvtColor(inhand_image, cv2.COLOR_RGB2BGR)
-
             return robot_pos, bp_image, inhand_image
 
         box_pos = self.scene.get_obj_pos(self.push_box)
