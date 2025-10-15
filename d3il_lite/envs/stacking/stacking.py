@@ -229,8 +229,8 @@ class StackingEnv(GymEnvWrapper):
         j_state, robot_c_pos, robot_c_quat = self.robot_state()
 
         if self.if_vision:
-            bp_image = self.bp_cam.get_image(depth=False)
-            inhand_image = self.inhand_cam.get_image(depth=False)
+            bp_image = self.bp_cam.get_image(depth=False).copy()
+            inhand_image = self.inhand_cam.get_image(depth=False).copy()
             return j_state, bp_image, inhand_image
 
         red_box_pos = self.scene.get_obj_pos(self.red_box)

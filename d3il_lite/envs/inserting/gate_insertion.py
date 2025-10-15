@@ -300,10 +300,6 @@ class InsertingEnv(GymEnvWrapper):
         box3_pos = self.scene.get_obj_pos(self.push_box3)[:2]
         box3_quat = np.tan(quat2euler(self.scene.get_obj_quat(self.push_box3))[-1:])
 
-        target_box1_pos = self.scene.get_obj_pos(self.target_box1)[:2]
-        target_box2_pos = self.scene.get_obj_pos(self.target_box2)[:2]
-        target_box3_pos = self.scene.get_obj_pos(self.target_box3)[:2]
-
         env_state = np.concatenate(
             [
                 robot_pos,
