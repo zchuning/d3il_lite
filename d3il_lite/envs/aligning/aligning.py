@@ -55,19 +55,15 @@ class BPCageCam(MjCamera):
 class BlockContextManager:
     def __init__(self, scene, index=0, seed=42) -> None:
         self.scene = scene
-
         np.random.seed(seed)
-
         self.box_space = Box(
             low=np.array([0.4, -0.25, -90]),
             high=np.array([0.6, -0.1, 90]),  # seed=seed
         )
-
         self.target_space = Box(
             low=np.array([0.4, 0.2, -90]),
             high=np.array([0.6, 0.35, 90]),  # seed=seed
         )
-
         # index = 0, push from inside
         # index = 1, push from outside
         self.index = index
@@ -77,42 +73,32 @@ class BlockContextManager:
             self.context = self.sample()
         else:
             self.context = context
-
         self.set_context(self.context)
-
         pos, quat, target_pos, target_quat = self.context
-
         return target_pos, target_quat
 
     def sample(self):
         pos = self.box_space.sample()
-
         goal_angle = [0, 0, pos[-1] * np.pi / 180]
         quat = euler2quat(goal_angle)
-
         target_pos = self.target_space.sample()
         target_angle = [0, 0, target_pos[-1] * np.pi / 180]
         target_quat = euler2quat(target_angle)
-
         return [pos, quat, target_pos, target_quat]
 
     def sample_target_pos(self):
         pos = self.target_space.sample()
-
         goal_angle = [0, 0, pos[-1] * np.pi / 180]
         quat = euler2quat(goal_angle)
-
         return [pos, quat]
 
     def set_context(self, context):
         pos, quat, target_pos, target_quat = context
-
         self.scene.set_obj_pos_and_quat(
             [pos[0], pos[1], 0.00],
             quat,
             obj_name="aligning_box",
         )
-
         self.scene.set_obj_pos_and_quat(
             [target_pos[0], target_pos[1], 0.00],
             target_quat,
@@ -130,11 +116,9 @@ class AligningEnv(GymEnvWrapper):
         max_steps_per_episode: int = 400,
         debug: bool = False,
         random_env: bool = False,
-        interactive: bool = False,
         render: bool = False,
         if_vision: bool = False,
     ):
-
         sim_factory = MjFactory()
         render_mode = Scene.RenderMode.HUMAN if render else Scene.RenderMode.BLIND
         scene = sim_factory.create_scene(
@@ -161,18 +145,15 @@ class AligningEnv(GymEnvWrapper):
         )
         self.observation_space = Box(low=-np.inf, high=np.inf, shape=(17,))
 
-        self.interactive = interactive
-
         self.random_env = random_env
         self.manager = BlockContextManager(scene, index=1)
 
         self.bp_cam = BPCageCam()
         self.inhand_cam = robot.inhand_cam
+        self.scene.add_object(self.bp_cam)
 
         self.push_box = obj_list[0]
         self.target_box = obj_list[1]
-
-        self.scene.add_object(self.bp_cam)
 
         self.log_dict = {
             "push-box": ObjectLogger(scene, self.push_box),
@@ -193,8 +174,9 @@ class AligningEnv(GymEnvWrapper):
         self.pos_min_dist = 0.018
         self.rot_min_dist = 0.048
         self.robot_box_dist = 0.051
-
-        self.first_visit = -1
+        
+        # Track desired position for perfect delta action accumulation
+        self.desired_pos = None
 
         # Start simulation
         self.start()
@@ -259,7 +241,16 @@ class AligningEnv(GymEnvWrapper):
         )
 
     def step(self, action, gripper_width=None, desired_vel=None, desired_acc=None):
-        action = np.concatenate([action, [0, 1, 0, 0]], axis=0)
+        # Initialize desired_position on first step if not set
+        if self.desired_pos is None:
+            self.desired_pos = self.robot_state()[:3].copy()
+        
+        # Accumulate delta action to desired position for perfect tracking
+        self.desired_pos += action
+        
+        # Use the accumulated desired position instead of current + delta
+        action = np.concatenate([self.desired_pos, [0, 1, 0, 0]], axis=0)
+        
         observation, reward, terminated, truncated, _ = super().step(
             action,
             gripper_width,
@@ -336,29 +327,23 @@ class AligningEnv(GymEnvWrapper):
 
         return False
 
-    def reset(self, seed=None, options=None, random=True, context=None):
+    def reset(self, seed=None, options={}):
         self.terminated = False
         self.env_step_counter = 0
         self.episode += 1
-        self.first_visit = -1
-
-        self.bp_mode = None
-        obs = self._reset_env(random=random, context=context)
-
+        
+        # Reset desired position tracking
+        self.desired_pos = None
+        
+        obs = self._reset_env(
+            random=options.get("random", True), 
+            context=options.get("context", None),
+        )
         return obs, {}
 
     def _reset_env(self, random=True, context=None):
-        if self.interactive:
-            for log_name, s in self.cam_dict.items():
-                s.reset()
-
-            for log_name, s in self.log_dict.items():
-                s.reset()
-
         self.scene.reset()
         self.robot.beam_to_joint_pos(self.robot.init_qpos)
         self.manager.start(random=random, context=context)
         self.scene.next_step(log=False)
-
-        observation = self.get_observation()
-        return observation
+        return self.get_observation()

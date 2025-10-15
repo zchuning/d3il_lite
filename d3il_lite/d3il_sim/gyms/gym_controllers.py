@@ -116,18 +116,7 @@ class GymCartesianVelController(GymController):
         return action_space
 
     def set_action(self, action):
-# <<<<<<< HEAD
-        # self.desired_c_pos = np.array(self.robot.current_c_pos) + np.array(action[:3])
         self.desired_c_pos = np.array(action[:3])
-        # self.desired_c_pos = np.clip(
-        #   self.desired_c_pos, self.min_cart_pos, self.max_cart_pos
-        # )
-# =======
-#         self.desired_c_pos = np.array(self.robot.des_c_pos) + np.array(action[:3])
-#         self.desired_c_pos = np.clip(
-#             self.desired_c_pos, self.min_cart_pos, self.max_cart_pos
-#         )
-# >>>>>>> origin/controller_fixes
 
         if self.fixed_orientation is None:
             desired_quat = np.array(action[3:])
