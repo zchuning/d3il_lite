@@ -10,6 +10,7 @@ from d3il_lite.d3il_sim.gyms.gym_env_wrapper import GymEnvWrapper
 from d3il_lite.d3il_sim.sims import MjCamera
 from d3il_lite.d3il_sim.sims.mj_beta.MjFactory import MjFactory
 from d3il_lite.d3il_sim.sims.mj_beta.MjRobot import MjRobot
+from d3il_lite.d3il_sim.sims.mj_beta.mj_utils.mj_render_singleton import reset_singleton
 from d3il_lite.d3il_sim.utils.geometric_transformation import euler2quat
 from d3il_lite.d3il_sim.utils.sim_path import d3il_path
 
@@ -202,6 +203,10 @@ class AligningEnv(GymEnvWrapper):
         return env_state.astype(np.float32)
 
     def start(self):
+        # reset camera cache
+        # Without this, instantiating multiple envs will cause later envs to render frozen images.
+        reset_singleton()
+
         self.scene.start()
 
         # reset view of the camera
