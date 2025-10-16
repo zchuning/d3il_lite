@@ -203,10 +203,6 @@ class AligningEnv(GymEnvWrapper):
         return env_state.astype(np.float32)
 
     def start(self):
-        # reset camera cache
-        # Without this, instantiating multiple envs will cause later envs to render frozen images.
-        reset_singleton()
-
         self.scene.start()
 
         # reset view of the camera

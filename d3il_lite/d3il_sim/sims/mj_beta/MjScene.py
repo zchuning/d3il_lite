@@ -61,6 +61,10 @@ class MjScene(Scene):
         return "mj"
 
     def _setup_scene(self):
+        # reset renderer cache
+        # Without this, instantiating multiple envs will cause later envs to render frozen images.
+        reset_render_singleton()
+
         for rb in self.robots:
             self.add_object(rb.inhand_cam)
 
