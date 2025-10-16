@@ -303,9 +303,17 @@ class StackingEnv(GymEnvWrapper):
         )
 
     def step(self, action, gripper_width=None, desired_vel=None, desired_acc=None):
-        j_pos = action[:7]
-        gripper_width = action[-1]
+        # Initialize desired_position on first step if not set
+        if self.desired_pos is None:
+            self.desired_pos = self.robot_state()[0][:7].copy().astype(np.float32)
+        
+        # Accumulate delta action to desired position for perfect tracking
+        self.desired_pos += action[:7]
+        
+        # Update action
+        action[:7] = self.desired_pos
 
+        gripper_width = action[-1]
         if gripper_width > 0.075:
             self.robot.open_fingers()
         else:
@@ -410,30 +418,22 @@ class StackingEnv(GymEnvWrapper):
         self.env_step_counter = 0
         self.episode += 1
 
+        # Reset desired position tracking
+        self.desired_pos = None
+
         self.min_inds = []
         self.mode_encoding = []
 
-        self.bp_mode = None
-        obs = self._reset_env(random=random, context=context)
-
+        obs = self._reset_env(
+            random=options.get("random", True), 
+            context=options.get("context", None),
+        )
         return obs, {}
 
     def _reset_env(self, random=True, context=None):
-        if self.interactive:
-            for log_name, s in self.cam_dict.items():
-                s.reset()
-
-            for log_name, s in self.log_dict.items():
-                s.reset()
-
         self.scene.reset()
         self.robot.beam_to_joint_pos(self.robot.init_qpos)
-
         self.robot.open_fingers()
-
         self.manager.start(random=random, context=context)
         self.scene.next_step(log=False)
-
-        observation = self.get_observation()
-
-        return observation
+        return self.get_observation()
