@@ -314,6 +314,9 @@ class SortingEnv(GymEnvWrapper):
         self.mode_step = 0
         self.min_inds = []
 
+        # Track desired position for perfect delta action accumulation
+        self.desired_pos = None
+
         # Start simulation
         self.start()
 
@@ -446,10 +449,14 @@ class SortingEnv(GymEnvWrapper):
         )
 
     def step(self, action, gripper_width=None, desired_vel=None, desired_acc=None):
-        robot_pos = self.robot_state()
-        action = np.concatenate(
-            [robot_pos[:2] + action, robot_pos[2:], [0, 1, 0, 0]], axis=0
-        )
+        # Initialize desired_position on first step if not set
+        if self.desired_pos is None:
+            self.desired_pos = self.robot_state()[:3].copy()
+        
+        # Accumulate delta action to desired position for perfect tracking
+        self.desired_pos[:2] += action
+
+        action = np.concatenate([self.desired_pos, [0, 1, 0, 0]], axis=0)
         observation, reward, terminated, truncated, _ = super().step(
             action, gripper_width, desired_vel=desired_vel, desired_acc=desired_acc
         )
@@ -587,33 +594,27 @@ class SortingEnv(GymEnvWrapper):
 
         return False
 
-    def reset(self, seed=None, options=None, random=True, context=None, if_vision=False):
+    def reset(self, seed=None, options={}):
         self.terminated = False
         self.env_step_counter = 0
         self.episode += 1
+
+        # Reset desired position tracking
+        self.desired_pos = None
 
         self.mode = np.array([-1, -1, -1, -1, -1, -1])
         self.mode_step = 0
         self.min_inds = []
 
-        self.bp_mode = None
-        obs = self._reset_env(random=random, context=context, if_vision=if_vision)
-
+        obs = self._reset_env(
+            random=options.get("random", True), 
+            context=options.get("context", None),
+        )
         return obs, {}
 
-    def _reset_env(self, random=True, context=None, if_vision=False):
-        if self.interactive:
-            for log_name, s in self.cam_dict.items():
-                s.reset()
-
-            for log_name, s in self.log_dict.items():
-                s.reset()
-
+    def _reset_env(self, random=True, context=None):
         self.scene.reset()
         self.robot.beam_to_joint_pos(self.robot.init_qpos)
         self.manager.start(random=random, context=context)
         self.scene.next_step(log=False)
-
-        observation = self.get_observation()
-
-        return observation
+        return self.get_observation()
