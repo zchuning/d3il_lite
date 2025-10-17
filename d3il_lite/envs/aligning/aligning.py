@@ -175,9 +175,6 @@ class AligningEnv(GymEnvWrapper):
         self.pos_min_dist = 0.018
         self.rot_min_dist = 0.048
         self.robot_box_dist = 0.051
-        
-        # Track desired position for perfect delta action accumulation
-        self.desired_pos = None
 
         # Start simulation
         self.start()
@@ -242,16 +239,7 @@ class AligningEnv(GymEnvWrapper):
         )
 
     def step(self, action, gripper_width=None, desired_vel=None, desired_acc=None):
-        # Initialize desired_position on first step if not set
-        if self.desired_pos is None:
-            self.desired_pos = self.robot_state()[:3].copy()
-        
-        # Accumulate delta action to desired position for perfect tracking
-        self.desired_pos += action
-        
-        # Use the accumulated desired position instead of current + delta
-        action = np.concatenate([self.desired_pos, [0, 1, 0, 0]], axis=0)
-        
+        action = np.concatenate([action, [0, 1, 0, 0]], axis=0)
         observation, reward, terminated, truncated, _ = super().step(
             action,
             gripper_width,
@@ -332,9 +320,6 @@ class AligningEnv(GymEnvWrapper):
         self.terminated = False
         self.env_step_counter = 0
         self.episode += 1
-        
-        # Reset desired position tracking
-        self.desired_pos = None
         
         obs = self._reset_env(
             random=options.get("random", True), 

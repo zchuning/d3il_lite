@@ -204,7 +204,7 @@ class SortingEnv(GymEnvWrapper):
     def __init__(
         self,
         n_substeps: int = 35,
-        max_steps_per_episode: int = 2e3,
+        max_steps_per_episode: int = 1000,
         debug: bool = False,
         random_env: bool = False,
         interactive: bool = False,
@@ -314,8 +314,8 @@ class SortingEnv(GymEnvWrapper):
         self.mode_step = 0
         self.min_inds = []
 
-        # Track desired position for perfect delta action accumulation
-        self.desired_pos = None
+        # Keep track of fixed z position
+        self.fixed_z = None
 
         # Start simulation
         self.start()
@@ -449,14 +449,10 @@ class SortingEnv(GymEnvWrapper):
         )
 
     def step(self, action, gripper_width=None, desired_vel=None, desired_acc=None):
-        # Initialize desired_position on first step if not set
-        if self.desired_pos is None:
-            self.desired_pos = self.robot_state()[:3].copy()
+        if self.fixed_z is None:
+            self.fixed_z = self.robot_state()[2:3].copy()
         
-        # Accumulate delta action to desired position for perfect tracking
-        self.desired_pos[:2] += action
-
-        action = np.concatenate([self.desired_pos, [0, 1, 0, 0]], axis=0)
+        action = np.concatenate([action, self.fixed_z, [0, 1, 0, 0]], axis=0)
         observation, reward, terminated, truncated, _ = super().step(
             action, gripper_width, desired_vel=desired_vel, desired_acc=desired_acc
         )
@@ -599,8 +595,7 @@ class SortingEnv(GymEnvWrapper):
         self.env_step_counter = 0
         self.episode += 1
 
-        # Reset desired position tracking
-        self.desired_pos = None
+        self.fixed_z = None
 
         self.mode = np.array([-1, -1, -1, -1, -1, -1])
         self.mode_step = 0

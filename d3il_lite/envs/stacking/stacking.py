@@ -138,7 +138,7 @@ class StackingEnv(GymEnvWrapper):
     def __init__(
         self,
         n_substeps: int = 30,
-        max_steps_per_episode: int = 50000,
+        max_steps_per_episode: int = 1000,
         debug: bool = False,
         random_env: bool = False,
         interactive: bool = False,
@@ -244,9 +244,6 @@ class StackingEnv(GymEnvWrapper):
         blue_box_pos = self.scene.get_obj_pos(self.blue_box)
         blue_box_quat = np.tan(quat2euler(self.scene.get_obj_quat(self.blue_box))[-1:])
 
-        target_pos = self.scene.get_obj_pos(self.target_box)  # - robot_c_pos
-        target_quat = self.scene.get_obj_quat(self.target_box)
-
         env_state = np.concatenate(
             [
                 red_box_pos,
@@ -303,16 +300,6 @@ class StackingEnv(GymEnvWrapper):
         )
 
     def step(self, action, gripper_width=None, desired_vel=None, desired_acc=None):
-        # Initialize desired_position on first step if not set
-        if self.desired_pos is None:
-            self.desired_pos = self.robot_state()[0][:7].copy().astype(np.float32)
-        
-        # Accumulate delta action to desired position for perfect tracking
-        self.desired_pos += action[:7]
-        
-        # Update action
-        action[:7] = self.desired_pos
-
         gripper_width = action[-1]
         if gripper_width > 0.075:
             self.robot.open_fingers()
@@ -417,9 +404,6 @@ class StackingEnv(GymEnvWrapper):
         self.terminated = False
         self.env_step_counter = 0
         self.episode += 1
-
-        # Reset desired position tracking
-        self.desired_pos = None
 
         self.min_inds = []
         self.mode_encoding = []
