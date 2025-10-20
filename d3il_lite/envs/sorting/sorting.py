@@ -456,16 +456,15 @@ class SortingEnv(GymEnvWrapper):
         observation, reward, terminated, truncated, _ = super().step(
             action, gripper_width, desired_vel=desired_vel, desired_acc=desired_acc
         )
+
         self.success = self._check_early_termination()
         mode, min_inds = self.check_mode()
-
         if self.num_boxes == 2:
             mode = mode[:2]
         elif self.num_boxes == 4:
             mode = mode[:4]
         elif self.num_boxes == 6:
             mode = mode[:6]
-
         mode = self.decode_mode(mode)
 
         return (
@@ -594,7 +593,6 @@ class SortingEnv(GymEnvWrapper):
         self.terminated = False
         self.env_step_counter = 0
         self.episode += 1
-
         self.fixed_z = None
 
         self.mode = np.array([-1, -1, -1, -1, -1, -1])

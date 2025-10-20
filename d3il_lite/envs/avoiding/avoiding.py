@@ -22,7 +22,7 @@ class BPCageCam(MjCamera):
     Cage camera. Extends the camera base class.
     """
 
-    def __init__(self, width: int = 1024, height: int = 1024, *args, **kwargs):
+    def __init__(self, width: int = 96, height: int = 96, *args, **kwargs):
         super().__init__(
             "bp_cam",
             width,
@@ -55,6 +55,7 @@ class AvoidingEnv(GymEnvWrapper):
         max_steps_per_episode: int = 250,
         debug: bool = False,
         render: bool = False,
+        if_vision: bool = False,
     ):
         sim_factory = MjFactory()
         render_mode = Scene.RenderMode.HUMAN if render else Scene.RenderMode.BLIND
@@ -73,6 +74,9 @@ class AvoidingEnv(GymEnvWrapper):
             n_substeps=n_substeps,
             debug=debug,
         )
+
+        self.if_vision = if_vision
+
         self.action_space = Box(
             low=np.array([-0.01, -0.01]), high=np.array([0.01, 0.01])
         )
@@ -81,7 +85,6 @@ class AvoidingEnv(GymEnvWrapper):
         self.manager = ObstacleAvoidanceManager()
 
         self.bp_cam = BPCageCam()
-
         self.scene.add_object(self.bp_cam)
 
         self.log_dict = {}
@@ -113,13 +116,19 @@ class AvoidingEnv(GymEnvWrapper):
 
         self.mode_encoding = np.zeros(2 + 3 + 4)
 
-        self.success = False
+        # Keep track of fixed z position
+        self.fixed_z = None
 
         # Start simulation
         self.start()
 
     def get_observation(self) -> np.ndarray:
         robot_c_pos = self.robot_state()[:2]
+
+        if self.if_vision:
+            bp_image = self.bp_cam.get_image(depth=False).copy()
+            return robot_c_pos, bp_image
+        
         return robot_c_pos.astype(np.float32)
 
     def start(self):
@@ -161,14 +170,17 @@ class AvoidingEnv(GymEnvWrapper):
         )
 
     def step(self, action, gripper_width=None):
-        robot_pos = self.robot_state()
-        action = np.concatenate(
-            [robot_pos[:2] + action, robot_pos[2:], [0, 1, 0, 0]], axis=0
-        )
+        if self.fixed_z is None:
+            self.fixed_z = self.robot_state()[2:3].copy()
+            
+        action = np.concatenate([action, self.fixed_z, [0, 1, 0, 0]], axis=0)
         observation, reward, terminated, truncated, _ = super().step(
             action, gripper_width
         )
+
+        self.success = self._check_early_termination()
         self.check_mode()
+        
         return (
             observation,
             reward,
@@ -239,8 +251,6 @@ class AvoidingEnv(GymEnvWrapper):
         assert np.sum(self.mode_encoding) <= 3
         self.mode_encoding = np.zeros(2 + 3 + 4)
 
-    def get_reward(self): ...
-
     def _check_early_termination(self) -> bool:
         if self.check_success() or self.check_failure():
             if self.check_success():
@@ -250,13 +260,17 @@ class AvoidingEnv(GymEnvWrapper):
 
         return False
 
-    def reset(self, seed=None, options=None, random=True, context=None):
+    def reset(self, seed=None, options={}):
         self.terminated = False
         self.env_step_counter = 0
         self.episode += 1
+        self.fixed_z = None
+
         self.reset_mode_encoding()
-        self.success = False
-        obs = self._reset_env(random=random, context=context)
+        obs = self._reset_env(
+            random=options.get("random", True), 
+            context=options.get("context", None),
+        )
         return obs, {}
 
     def _reset_env(self, random=True, context=None):
@@ -266,17 +280,18 @@ class AvoidingEnv(GymEnvWrapper):
         observation = self.get_observation()
         return observation
 
-    def reward(self, x):
+    def get_reward(self):        
         def squared_exp_kernel(x, mean, scale, bandwidth):
             return scale * np.exp(
-                np.square(np.linalg.norm(x - mean, axis=1)) / bandwidth
+                np.square(np.linalg.norm(x - mean)) / bandwidth
             )
 
-        rewards = np.zeros(x.shape[0])
-        for obs in self.obj_xy_list:
-            rewards -= squared_exp_kernel(x, np.array(obs), 1, 1)
-        rewards -= np.abs(x[:, 0] - 0.4)
-        return rewards
+        xy = self.robot_state()[:2]
+        reward = 0
+        for obj in self.obj_xy_list:
+            reward -= squared_exp_kernel(xy, np.array(obj), 1, 1)
+        reward -= np.abs(xy[0] - 0.4)
+        return reward
 
     def mode_decoding(self, data):
         data_decimal = data.dot(1 << np.arange(data.shape[-1]))

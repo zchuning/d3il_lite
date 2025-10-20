@@ -323,9 +323,7 @@ class StackingEnv(GymEnvWrapper):
 
         self.success = self._check_early_termination()
         mode_encoding, mean_distance = self.check_mode()
-
-        mode = ""
-        mode = mode.join(mode_encoding)
+        mode = "".join(mode_encoding)
 
         return (
             observation,
