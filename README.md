@@ -1,8 +1,12 @@
 # Lightweight D3IL Simulation Framework
 This project contains a lightweight implementation of the D3IL simulation framework.
-- Supports the gymnasium API and mujoco 3.X.
-- Simplifies installation so no need to install individual environments.
-- Fixes action space of environment to remove the need to manually concatenate dummy action dimensions.
+- Support gymnasium API and mujoco 3.X.
+- Simplify installation so no need to install individual environments.
+- Fix action space of environment to remove the need to manually concatenate dummy action dimensions.
+- Fix rendering issue with multiple environment instances.
+- Use absolute position control.
+- Use dictionary observation space.
+- Add render function.
 
 ## File System
 
