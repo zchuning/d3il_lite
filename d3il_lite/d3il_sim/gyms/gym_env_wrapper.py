@@ -157,3 +157,10 @@ class GymEnvWrapper(gym.Env, ABC):
         tcp_quad = self.robot.current_c_quat
 
         return tcp_pos
+
+    def render(self, mode: str = "rgb_array"):
+        if not hasattr(self, "bp_cam") or self.bp_cam is None:
+            raise NotImplementedError(
+                "Render not implemented for this environment"
+            )
+        return self.bp_cam.get_image(depth=False)
