@@ -1,7 +1,7 @@
 import copy
 
 import numpy as np
-from gymnasium.spaces import Box
+from gymnasium.spaces import Box, Dict
 
 from d3il_lite.d3il_sim.core import Scene
 from d3il_lite.d3il_sim.core.Logger import CamLogger
@@ -80,7 +80,21 @@ class AvoidingEnv(GymEnvWrapper):
         self.action_space = Box(
             low=np.array([-0.01, -0.01]), high=np.array([0.01, 0.01])
         )
-        self.observation_space = Box(low=-np.inf, high=np.inf, shape=(2,))
+        if self.if_vision:
+            self.observation_space = Dict(
+                {
+                    "bp-cam": Box(
+                        low=0, high=255, shape=(96, 96, 3), dtype=np.uint8
+                    ),
+                    "proprio": Box(low=-np.inf, high=np.inf, shape=(2,)),
+                }
+            )
+        else:
+            self.observation_space = Dict(
+                {
+                    "state": Box(low=-np.inf, high=np.inf, shape=(2,)),
+                }
+            )
 
         self.manager = ObstacleAvoidanceManager()
 
@@ -122,14 +136,17 @@ class AvoidingEnv(GymEnvWrapper):
         # Start simulation
         self.start()
 
-    def get_observation(self) -> np.ndarray:
+    def get_observation(self) -> dict[str, np.ndarray]:
         robot_c_pos = self.robot_state()[:2]
 
         if self.if_vision:
             bp_image = self.bp_cam.get_image(depth=False).copy()
-            return robot_c_pos, bp_image
+            return {
+                "bp-cam": bp_image,
+                "proprio": robot_c_pos.astype(np.float32),
+            }
         
-        return robot_c_pos.astype(np.float32)
+        return {"state": robot_c_pos.astype(np.float32)}
 
     def start(self):
         self.scene.start()
@@ -250,6 +267,19 @@ class AvoidingEnv(GymEnvWrapper):
         self.l3_passed = False
         assert np.sum(self.mode_encoding) <= 3
         self.mode_encoding = np.zeros(2 + 3 + 4)
+    
+    def get_reward(self):        
+        def squared_exp_kernel(x, mean, scale, bandwidth):
+            return scale * np.exp(
+                np.square(np.linalg.norm(x - mean)) / bandwidth
+            )
+
+        xy = self.robot_state()[:2]
+        reward = 0
+        for obj in self.obj_xy_list:
+            reward -= squared_exp_kernel(xy, np.array(obj), 1, 1)
+        reward -= np.abs(xy[0] - 0.4)
+        return reward
 
     def _check_early_termination(self) -> bool:
         if self.check_success() or self.check_failure():
@@ -261,6 +291,7 @@ class AvoidingEnv(GymEnvWrapper):
         return False
 
     def reset(self, seed=None, options={}):
+        self.seed(seed)
         self.terminated = False
         self.env_step_counter = 0
         self.episode += 1
@@ -279,19 +310,6 @@ class AvoidingEnv(GymEnvWrapper):
         self.scene.next_step()
         observation = self.get_observation()
         return observation
-
-    def get_reward(self):        
-        def squared_exp_kernel(x, mean, scale, bandwidth):
-            return scale * np.exp(
-                np.square(np.linalg.norm(x - mean)) / bandwidth
-            )
-
-        xy = self.robot_state()[:2]
-        reward = 0
-        for obj in self.obj_xy_list:
-            reward -= squared_exp_kernel(xy, np.array(obj), 1, 1)
-        reward -= np.abs(xy[0] - 0.4)
-        return reward
 
     def mode_decoding(self, data):
         data_decimal = data.dot(1 << np.arange(data.shape[-1]))

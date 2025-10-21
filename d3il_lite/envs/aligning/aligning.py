@@ -2,7 +2,7 @@ import copy
 
 import cv2
 import numpy as np
-from gymnasium.spaces import Box
+from gymnasium.spaces import Box, Dict 
 
 from d3il_lite.d3il_sim.core import Scene
 from d3il_lite.d3il_sim.core.Logger import CamLogger, ObjectLogger
@@ -144,7 +144,24 @@ class AligningEnv(GymEnvWrapper):
         self.action_space = Box(
             low=np.array([-0.01, -0.01, -0.01]), high=np.array([0.01, 0.01, 0.01])
         )
-        self.observation_space = Box(low=-np.inf, high=np.inf, shape=(17,))
+        if self.if_vision:
+            self.observation_space = Dict(
+                {
+                    "bp-cam": Box(
+                        low=0, high=255, shape=(96, 96, 3), dtype=np.uint8
+                    ),
+                    "inhand-cam": Box(
+                        low=0, high=255, shape=(96, 96, 3), dtype=np.uint8
+                    ),
+                    "proprio": Box(low=-np.inf, high=np.inf, shape=(2,)),
+                }
+            )
+        else:
+            self.observation_space = Dict(
+                {
+                    "state": Box(low=-np.inf, high=np.inf, shape=(17,)),
+                }
+            )
 
         self.random_env = random_env
         self.manager = BlockContextManager(scene, index=1)
@@ -179,13 +196,17 @@ class AligningEnv(GymEnvWrapper):
         # Start simulation
         self.start()
 
-    def get_observation(self) -> np.ndarray:
+    def get_observation(self) -> dict[str, np.ndarray]:
         robot_pos = self.robot_state()
 
         if self.if_vision:
             bp_image = self.bp_cam.get_image(depth=False).copy()
             inhand_image = self.inhand_cam.get_image(depth=False).copy()
-            return robot_pos, bp_image, inhand_image
+            return {
+                "bp-cam": bp_image,
+                "inhand-cam": inhand_image,
+                "proprio": robot_pos.astype(np.float32),
+            }
 
         box_pos = self.scene.get_obj_pos(self.push_box)
         box_quat = self.scene.get_obj_quat(self.push_box)
@@ -197,7 +218,7 @@ class AligningEnv(GymEnvWrapper):
             [robot_pos, box_pos, box_quat, target_pos, target_quat]
         )
 
-        return env_state.astype(np.float32)
+        return {"state": env_state.astype(np.float32)}
 
     def start(self):
         self.scene.start()
@@ -317,6 +338,7 @@ class AligningEnv(GymEnvWrapper):
         return False
 
     def reset(self, seed=None, options={}):
+        self.seed(seed)
         self.terminated = False
         self.env_step_counter = 0
         self.episode += 1

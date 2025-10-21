@@ -2,7 +2,7 @@ import copy
 
 import cv2
 import numpy as np
-from gymnasium.spaces import Box
+from gymnasium.spaces import Box, Dict
 
 from d3il_lite.d3il_sim.core import Scene
 from d3il_lite.d3il_sim.core.Logger import CamLogger, ObjectLogger
@@ -168,7 +168,24 @@ class StackingEnv(GymEnvWrapper):
         self.if_vision = if_vision
 
         self.action_space = Box(low=-0.01, high=0.01, shape=(8,))  # 7 joint + gripper
-        self.observation_space = Box(low=-np.inf, high=np.inf, shape=(20,))
+        if self.if_vision:
+            self.observation_space = Dict(
+                {
+                    "bp-cam": Box(
+                        low=0, high=255, shape=(96, 96, 3), dtype=np.uint8
+                    ),
+                    "inhand-cam": Box(
+                        low=0, high=255, shape=(96, 96, 3), dtype=np.uint8
+                    ),
+                    "proprio": Box(low=-np.inf, high=np.inf, shape=(8,)),
+                }
+            )
+        else:
+            self.observation_space = Dict(
+                {
+                    "state": Box(low=-np.inf, high=np.inf, shape=(20,)),
+                }
+            )
 
         self.interactive = interactive
 
@@ -225,13 +242,17 @@ class StackingEnv(GymEnvWrapper):
 
         return np.concatenate((joint_pos, gripper_width)), joint_pos, tcp_quad
 
-    def get_observation(self) -> np.ndarray:
+    def get_observation(self) -> dict[str, np.ndarray]:
         j_state, robot_c_pos, robot_c_quat = self.robot_state()
 
         if self.if_vision:
             bp_image = self.bp_cam.get_image(depth=False).copy()
             inhand_image = self.inhand_cam.get_image(depth=False).copy()
-            return j_state, bp_image, inhand_image
+            return {
+                "bp-cam": bp_image,
+                "inhand-cam": inhand_image,
+                "proprio": j_state.astype(np.float32),
+            }
 
         red_box_pos = self.scene.get_obj_pos(self.red_box)
         red_box_quat = np.tan(quat2euler(self.scene.get_obj_quat(self.red_box))[-1:])
@@ -245,7 +266,8 @@ class StackingEnv(GymEnvWrapper):
         blue_box_quat = np.tan(quat2euler(self.scene.get_obj_quat(self.blue_box))[-1:])
 
         env_state = np.concatenate(
-            [
+            [   
+                j_state,
                 red_box_pos,
                 red_box_quat,
                 green_box_pos,
@@ -255,7 +277,7 @@ class StackingEnv(GymEnvWrapper):
             ]
         )
 
-        return env_state.astype(np.float32)
+        return {"state": env_state.astype(np.float32)}
 
     def start(self):
         self.scene.start()
@@ -399,6 +421,7 @@ class StackingEnv(GymEnvWrapper):
         return False
 
     def reset(self, seed=None, options=None, random=True, context=None):
+        self.seed(seed)
         self.terminated = False
         self.env_step_counter = 0
         self.episode += 1

@@ -3,7 +3,7 @@ import random
 
 import cv2
 import numpy as np
-from gymnasium.spaces import Box
+from gymnasium.spaces import Box, Dict
 
 from d3il_lite.d3il_sim.core import Scene
 from d3il_lite.d3il_sim.core.Logger import CamLogger, ObjectLogger
@@ -246,10 +246,25 @@ class SortingEnv(GymEnvWrapper):
         self.action_space = Box(
             low=np.array([-0.01, -0.01]), high=np.array([0.01, 0.01])
         )
-        self.observation_space = Box(
-            low=-np.inf, high=np.inf, shape=(4 + 3 * num_boxes,)
-        )
-
+        if self.if_vision:
+            self.observation_space = Dict(
+                {
+                    "bp-cam": Box(
+                        low=0, high=255, shape=(96, 96, 3), dtype=np.uint8
+                    ),
+                    "inhand-cam": Box(
+                        low=0, high=255, shape=(96, 96, 3), dtype=np.uint8
+                    ),
+                    "proprio": Box(low=-np.inf, high=np.inf, shape=(2,)),
+                }
+            )
+        else:
+            self.observation_space = Dict(
+                {
+                    "state": Box(low=-np.inf, high=np.inf, shape=(4 + 3 * num_boxes,)),
+                }
+            )
+        
         self.interactive = interactive
 
         self.random_env = random_env
@@ -320,13 +335,17 @@ class SortingEnv(GymEnvWrapper):
         # Start simulation
         self.start()
 
-    def get_observation(self) -> np.ndarray:
+    def get_observation(self) -> dict[str, np.ndarray]:
         robot_pos = self.robot_state()[:2]
 
         if self.if_vision:
             bp_image = self.bp_cam.get_image(depth=False).copy()
             inhand_image = self.inhand_cam.get_image(depth=False).copy()
-            return robot_pos, bp_image, inhand_image
+            return {
+                "bp-cam": bp_image,
+                "inhand-cam": inhand_image,
+                "proprio": robot_pos.astype(np.float32),
+            }
 
         red_box_1_pos = self.scene.get_obj_pos(self.red_box_1)[:2]
         red_box_1_quat = np.tan(
@@ -404,7 +423,7 @@ class SortingEnv(GymEnvWrapper):
         else:
             assert False, "no such num boxes"
 
-        return env_state.astype(np.float32)
+        return {"state": env_state.astype(np.float32)}
 
     def start(self):
         self.scene.start()
@@ -590,6 +609,7 @@ class SortingEnv(GymEnvWrapper):
         return False
 
     def reset(self, seed=None, options={}):
+        self.seed(seed)
         self.terminated = False
         self.env_step_counter = 0
         self.episode += 1

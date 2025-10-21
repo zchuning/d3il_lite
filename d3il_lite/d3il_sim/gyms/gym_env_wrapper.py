@@ -17,8 +17,8 @@ class GymEnvWrapper(gym.Env, ABC):
         self,
         scene: Scene,
         controller: ControllerBase,
-        max_steps_per_episode,
-        n_substeps,
+        max_steps_per_episode: int,
+        n_substeps: int,
         debug: bool = False,
     ):
         self.scene = scene
@@ -82,7 +82,7 @@ class GymEnvWrapper(gym.Env, ABC):
         return observation, reward, terminated, False, debug_info
 
     @abstractmethod
-    def get_observation(self) -> np.ndarray:
+    def get_observation(self) -> dict[str, np.ndarray]:
         """Compute an observation of your gym.
         Can be the complete robot and environment state, a camera image, etc.
         Returns:
@@ -132,6 +132,7 @@ class GymEnvWrapper(gym.Env, ABC):
         raise NotImplementedError
 
     def reset(self, seed=None, options=None):
+        self.seed(seed)
         self.terminated = False
         self.env_step_counter = 0
         self.episode += 1
