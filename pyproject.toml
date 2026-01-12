@@ -30,6 +30,10 @@ dependencies = [
 [tool.setuptools.packages.find]
 include = ["d3il_lite*"]
 
+# Include package data
+[tool.setuptools.package-data]
+"*" = ["**/*.gin", "**/*.xml", "**/*.stl", "**/*.obj", "**/*.json"]
+
 [tool.black]
 line-length = 100
 exclude = '''
