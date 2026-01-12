@@ -8,7 +8,7 @@ from gymnasium.spaces import Box, Dict
 from d3il_lite.d3il_sim.core import Scene
 from d3il_lite.d3il_sim.core.Logger import CamLogger, ObjectLogger
 from d3il_lite.d3il_sim.gyms.gym_env_wrapper import GymEnvWrapper
-from d3il_lite.d3il_sim.sims import MjCamera
+from d3il_lite.d3il_sim.sims.mj_beta.MjCamera import MjCamera
 from d3il_lite.d3il_sim.sims.mj_beta.MjFactory import MjFactory
 from d3il_lite.d3il_sim.sims.mj_beta.MjRobot import MjRobot
 from d3il_lite.d3il_sim.utils.geometric_transformation import (
