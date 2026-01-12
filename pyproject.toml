@@ -20,10 +20,13 @@ classifiers = [
 ]
 
 dependencies = [
-  "mujoco==3.3.6",
-  "gymnasium==1.1.1",
-  "pin",
   "gin-config",
+  "gymnasium==1.1.1",
+  "mujoco==3.3.6",
+  "imageio",
+  "opencv-python",
+  "pin",
+  "scipy",
 ]
 
 # Auto-discover all packages under d3il_lite/
