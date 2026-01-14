@@ -37,6 +37,29 @@ register(
 )
 
 register(
+    id="sorting4-v0",
+    entry_point="d3il_lite.envs.sorting:SortingEnv",
+    kwargs={
+        "max_steps_per_episode": 1000,
+        "render": False,
+        "num_boxes": 4,
+        "if_vision": False,
+    },
+)
+
+
+register(
+    id="sorting6-v0",
+    entry_point="d3il_lite.envs.sorting:SortingEnv",
+    kwargs={
+        "max_steps_per_episode": 1000,
+        "render": False,
+        "num_boxes": 6,
+        "if_vision": False,
+    },
+)
+
+register(
     id="stacking-v0",
     entry_point="d3il_lite.envs.stacking:StackingEnv",
     kwargs={
