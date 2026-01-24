@@ -54,41 +54,44 @@ class BPCageCam(MjCamera):
 
 
 class BlockContextManager:
-    def __init__(self, scene, index=0, seed=42) -> None:
+    def __init__(self, scene, index=0) -> None:
         self.scene = scene
-        np.random.seed(seed)
-        self.box_space = Box(
-            low=np.array([0.4, -0.25, -90]),
-            high=np.array([0.6, -0.1, 90]),  # seed=seed
-        )
-        self.target_space = Box(
-            low=np.array([0.4, 0.2, -90]),
-            high=np.array([0.6, 0.35, 90]),  # seed=seed
-        )
+        self.spaces = Dict({
+            "box": Box(
+                low=np.array([0.4, -0.25, -90]),
+                high=np.array([0.6, -0.1, 90]),
+            ),
+            "target": Box(
+                low=np.array([0.4, 0.2, -90]),
+                high=np.array([0.6, 0.35, 90]),
+            )
+        })
         # index = 0, push from inside
         # index = 1, push from outside
         self.index = index
 
-    def start(self, random=True, context=None):
+    def start(self, random=True, context=None, seed=42):
         if random:
-            self.context = self.sample()
+            self.context = self.sample(seed)
         else:
             self.context = context
         self.set_context(self.context)
         pos, quat, target_pos, target_quat = self.context
         return target_pos, target_quat
 
-    def sample(self):
-        pos = self.box_space.sample()
+    def sample(self, seed=42):
+        self.spaces.seed(seed)
+        samples = self.spaces.sample()
+        pos = samples["box"]
         goal_angle = [0, 0, pos[-1] * np.pi / 180]
         quat = euler2quat(goal_angle)
-        target_pos = self.target_space.sample()
+        target_pos = samples["target"]
         target_angle = [0, 0, target_pos[-1] * np.pi / 180]
         target_quat = euler2quat(target_angle)
         return [pos, quat, target_pos, target_quat]
 
     def sample_target_pos(self):
-        pos = self.target_space.sample()
+        pos = self.spaces['target'].sample()
         goal_angle = [0, 0, pos[-1] * np.pi / 180]
         quat = euler2quat(goal_angle)
         return [pos, quat]
@@ -346,12 +349,13 @@ class AligningEnv(GymEnvWrapper):
         obs = self._reset_env(
             random=options.get("random", True), 
             context=options.get("context", None),
+            seed=seed,
         )
         return obs, {}
 
-    def _reset_env(self, random=True, context=None):
+    def _reset_env(self, random=True, context=None, seed=42):
         self.scene.reset()
         self.robot.beam_to_joint_pos(self.robot.init_qpos)
-        self.manager.start(random=random, context=context)
+        self.manager.start(random=random, context=context, seed=seed)
         self.scene.next_step(log=False)
         return self.get_observation()

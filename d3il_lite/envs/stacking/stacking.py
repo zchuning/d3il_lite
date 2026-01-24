@@ -45,55 +45,55 @@ class BPCageCam(MjCamera):
 
 
 class BlockContextManager:
-    def __init__(self, scene, index=0, seed=42) -> None:
+    def __init__(self, scene, index=0) -> None:
         self.scene = scene
 
-        np.random.seed(seed)
-
-        self.red_space = Box(
-            low=np.array([0.35, -0.25, -90]),
-            high=np.array([0.45, -0.15, 90]),  # seed=seed
-        )
-
-        self.green_space = Box(
-            low=np.array([0.35, -0.1, -90]),
-            high=np.array([0.45, 0, 90]),  # seed=seed
-        )
-
-        self.blue_space = Box(
-            low=np.array([0.55, -0.2, -90]),
-            high=np.array([0.6, 0, 90]),  # seed=seed
-        )
-
-        self.target_space = Box(
-            low=np.array([0.4, 0.15, -90]),
-            high=np.array([0.6, 0.25, 90]),  # seed=seed
-        )
+        self.spaces = Dict({
+            "red": Box(
+                low=np.array([0.35, -0.25, -90]),
+                high=np.array([0.45, -0.15, 90]),
+            ),
+            "green": Box(
+                low=np.array([0.35, -0.1, -90]),
+                high=np.array([0.45, 0, 90]),
+            ),
+            "blue": Box(
+                low=np.array([0.55, -0.2, -90]),
+                high=np.array([0.6, 0, 90]),
+            ),
+            "target": Box(
+                low=np.array([0.4, 0.15, -90]),
+                high=np.array([0.6, 0.25, 90]),
+            )
+        })
 
         self.index = index
 
-    def start(self, random=True, context=None):
+    def start(self, random=True, context=None, seed=42):
         if random:
-            self.context = self.sample()
+            self.context = self.sample(seed)
         else:
             self.context = context
 
         self.set_context(self.context)
 
-    def sample(self):
-        pos_1 = self.red_space.sample()
+    def sample(self, seed=42):
+        self.spaces.seed(seed)
+        samples = self.spaces.sample()
+
+        pos_1 = samples["red"]
         angle_1 = [0, 0, pos_1[-1] * np.pi / 180]
         quat_1 = euler2quat(angle_1)
 
-        pos_2 = self.green_space.sample()
+        pos_2 = samples["green"]
         angle_2 = [0, 0, pos_2[-1] * np.pi / 180]
         quat_2 = euler2quat(angle_2)
 
-        pos_3 = self.blue_space.sample()
+        pos_3 = samples["blue"]
         angle_3 = [0, 0, pos_3[-1] * np.pi / 180]
         quat_3 = euler2quat(angle_3)
 
-        pos_4 = self.target_space.sample()
+        pos_4 = samples["target"]
         angle_4 = [0, 0, pos_4[-1] * np.pi / 180]
         quat_4 = euler2quat(angle_4)
 
@@ -420,7 +420,7 @@ class StackingEnv(GymEnvWrapper):
 
         return False
 
-    def reset(self, seed=None, options=None, random=True, context=None):
+    def reset(self, seed=None, options={}):
         self.seed(seed)
         self.terminated = False
         self.env_step_counter = 0
@@ -432,13 +432,14 @@ class StackingEnv(GymEnvWrapper):
         obs = self._reset_env(
             random=options.get("random", True), 
             context=options.get("context", None),
+            seed=seed,
         )
         return obs, {}
 
-    def _reset_env(self, random=True, context=None):
+    def _reset_env(self, random=True, context=None, seed=42):
         self.scene.reset()
         self.robot.beam_to_joint_pos(self.robot.init_qpos)
         self.robot.open_fingers()
-        self.manager.start(random=random, context=context)
+        self.manager.start(random=random, context=context, seed=seed)
         self.scene.next_step(log=False)
         return self.get_observation()

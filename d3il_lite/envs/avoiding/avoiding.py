@@ -301,10 +301,11 @@ class AvoidingEnv(GymEnvWrapper):
         obs = self._reset_env(
             random=options.get("random", True), 
             context=options.get("context", None),
+            seed=seed,
         )
         return obs, {}
 
-    def _reset_env(self, random=True, context=None):
+    def _reset_env(self, random=True, context=None, seed=42):
         self.scene.reset()
         self.robot.beam_to_joint_pos(self.robot.init_qpos)
         self.scene.next_step()

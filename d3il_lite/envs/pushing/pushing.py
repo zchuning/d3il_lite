@@ -3,7 +3,7 @@ import sys
 import time
 
 import numpy as np
-from gymnasium.spaces import Box
+from gymnasium.spaces import Box, Dict
 
 from d3il_lite.d3il_sim.core import Scene
 from d3il_lite.d3il_sim.core.Logger import CamLogger, ObjectLogger
@@ -46,19 +46,19 @@ class BPCageCam(MjCamera):
 
 
 class BlockContextManager:
-    def __init__(self, scene, index=0, seed=42) -> None:
+    def __init__(self, scene, index=0) -> None:
         self.scene = scene
 
-        np.random.seed(seed)
-
-        self.red_box_space = Box(
-            low=np.array([0.4, -0.15, -90]),
-            high=np.array([0.5, 0, 90]),  # seed=seed
-        )
-        self.green_box_space = Box(
-            low=np.array([0.55, -0.15, -90]),
-            high=np.array([0.65, 0, 90]),  # seed=seed
-        )
+        self.spaces = Dict({
+            "red": Box(
+                low=np.array([0.4, -0.15, -90]),
+                high=np.array([0.5, 0, 90]),
+            ),
+            "green": Box(
+                low=np.array([0.55, -0.15, -90]),
+                high=np.array([0.65, 0, 90]),
+            )
+        })
 
         # Reduced context space size
         self.deg_list = np.random.random_sample(60) * 90 - 45
@@ -68,17 +68,19 @@ class BlockContextManager:
 
         self.index = index
 
-    def start(self, random=True, context=None):
+    def start(self, random=True, context=None, seed=42):
         if random:
-            self.context = self.sample()
+            self.context = self.sample(seed)
         else:
             self.context = context
 
         self.set_context(self.context)
 
-    def sample(self):
-        red_pos = self.red_box_space.sample()
-        green_pos = self.green_box_space.sample()
+    def sample(self, seed=42):
+        self.spaces.seed(seed)
+        samples = self.spaces.sample()
+        red_pos = samples["red"]
+        green_pos = samples["green"]
 
         goal_angle = [0, 0, red_pos[-1] * np.pi / 180]
         quat = euler2quat(goal_angle)
@@ -403,18 +405,23 @@ class PushingEnv(GymEnvWrapper):
 
         return False
 
-    def reset(self, seed=None, options=None, random=True, context=None):
+    def reset(self, seed=None, options={}):
+        self.seed(seed)
         self.terminated = False
         self.env_step_counter = 0
         self.episode += 1
         self.first_visit = -1
 
         self.bp_mode = None
-        obs = self._reset_env(random=random, context=context)
+        obs = self._reset_env(
+            random=options.get("random", True), 
+            context=options.get("context", None),
+            seed=seed,
+        )
 
         return obs, {}
 
-    def _reset_env(self, random=True, context=None):
+    def _reset_env(self, random=True, context=None, seed=42):
         if self.interactive:
             for log_name, s in self.cam_dict.items():
                 s.reset()
@@ -424,7 +431,7 @@ class PushingEnv(GymEnvWrapper):
 
         self.scene.reset()
         self.robot.beam_to_joint_pos(self.robot.init_qpos)
-        self.manager.start(random=random, context=context)
+        self.manager.start(random=random, context=context, seed=seed)
         self.scene.next_step(log=False)
 
         observation = self.get_observation()

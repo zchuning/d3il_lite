@@ -45,74 +45,72 @@ class BPCageCam(MjCamera):
 
 
 class BlockContextManager:
-    def __init__(self, scene, index=0, num_boxes=2, seed=42) -> None:
+    def __init__(self, scene, index=0, num_boxes=2) -> None:
         self.scene = scene
 
-        np.random.seed(seed)
-
-        self.box1_space = Box(
-            low=np.array([0.4, -0.15, -90]),
-            high=np.array([0.5, -0.1, 90]),  # seed=seed
-        )
-
-        self.box2_space = Box(
-            low=np.array([0.4, -0.05, -90]),
-            high=np.array([0.5, 0, 90]),  # seed=seed
-        )
-
-        self.box3_space = Box(
-            low=np.array([0.4, 0.05, -90]),
-            high=np.array([0.5, 0.1, 90]),  # seed=seed
-        )
-
-        self.box4_space = Box(
-            low=np.array([0.55, -0.15, -90]),
-            high=np.array([0.65, -0.1, 90]),  # seed=seed
-        )
-
-        self.box5_space = Box(
-            low=np.array([0.55, -0.05, -90]),
-            high=np.array([0.65, 0, 90]),  # seed=seed
-        )
-
-        self.box6_space = Box(
-            low=np.array([0.55, 0.05, -90]),
-            high=np.array([0.65, 0.1, 90]),  # seed=seed
-        )
+        self.spaces = Dict({
+            "box1": Box(
+                low=np.array([0.4, -0.15, -90]),
+                high=np.array([0.5, -0.1, 90]),
+            ),
+            "box2": Box(
+                low=np.array([0.4, -0.05, -90]),
+                high=np.array([0.5, 0, 90]),
+            ),
+            "box3": Box(
+                low=np.array([0.4, 0.05, -90]),
+                high=np.array([0.5, 0.1, 90]),
+            ),
+            "box4": Box(
+                low=np.array([0.55, -0.15, -90]),
+                high=np.array([0.65, -0.1, 90]),
+            ),
+            "box5": Box(
+                low=np.array([0.55, -0.05, -90]),
+                high=np.array([0.65, 0, 90]),
+            ),
+            "box6": Box(
+                low=np.array([0.55, 0.05, -90]),
+                high=np.array([0.65, 0.1, 90]),
+            )
+        })
 
         self.index = index
         self.num_boxes = num_boxes
 
-    def start(self, random=True, context=None):
+    def start(self, random=True, context=None, seed=42):
         if random:
-            self.context = self.sample()
+            self.context = self.sample(seed)
         else:
             self.context = context
 
         self.set_context(self.context)
 
-    def sample(self):
-        pos_1 = self.box1_space.sample()
+    def sample(self, seed=42):
+        self.spaces.seed(seed)
+        samples = self.spaces.sample()
+        
+        pos_1 = samples["box1"]
         angle_1 = [0, 0, pos_1[-1] * np.pi / 180]
         quat_1 = euler2quat(angle_1)
 
-        pos_2 = self.box2_space.sample()
+        pos_2 = samples["box2"]
         angle_2 = [0, 0, pos_2[-1] * np.pi / 180]
         quat_2 = euler2quat(angle_2)
 
-        pos_3 = self.box3_space.sample()
+        pos_3 = samples["box3"]
         angle_3 = [0, 0, pos_3[-1] * np.pi / 180]
         quat_3 = euler2quat(angle_3)
 
-        pos_4 = self.box4_space.sample()
+        pos_4 = samples["box4"]
         angle_4 = [0, 0, pos_4[-1] * np.pi / 180]
         quat_4 = euler2quat(angle_4)
 
-        pos_5 = self.box5_space.sample()
+        pos_5 = samples["box5"]
         angle_5 = [0, 0, pos_5[-1] * np.pi / 180]
         quat_5 = euler2quat(angle_5)
 
-        pos_6 = self.box6_space.sample()
+        pos_6 = samples["box6"]
         angle_6 = [0, 0, pos_6[-1] * np.pi / 180]
         quat_6 = euler2quat(angle_6)
 
@@ -125,7 +123,7 @@ class BlockContextManager:
             [pos_6, quat_6],
         ]
 
-        random.shuffle(contexts)
+        random.Random(seed).shuffle(contexts)
 
         return contexts
 
@@ -622,12 +620,13 @@ class SortingEnv(GymEnvWrapper):
         obs = self._reset_env(
             random=options.get("random", True), 
             context=options.get("context", None),
+            seed=seed,
         )
         return obs, {}
 
-    def _reset_env(self, random=True, context=None):
+    def _reset_env(self, random=True, context=None, seed=42):
         self.scene.reset()
         self.robot.beam_to_joint_pos(self.robot.init_qpos)
-        self.manager.start(random=random, context=context)
+        self.manager.start(random=random, context=context, seed=seed)
         self.scene.next_step(log=False)
         return self.get_observation()
